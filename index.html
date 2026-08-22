@@ -4462,12 +4462,12 @@
         },
 
         pagination: {
-          general_waste: { page: 1, pageSize: 25 },
-          subdistrict_waste: { page: 1, pageSize: 25 },
-          infectious_hazardous: { page: 1, pageSize: 25 },
-          disposal_detail: { page: 1, pageSize: 25 },
-          disposal_history: { page: 1, pageSize: 25 },
-          preview_modal: { page: 1, pageSize: 25 }
+          general_waste: { page: 1, pageSize: 10 },
+          subdistrict_waste: { page: 1, pageSize: 10 },
+          infectious_hazardous: { page: 1, pageSize: 10 },
+          disposal_detail: { page: 1, pageSize: 10 },
+          disposal_history: { page: 1, pageSize: 10 },
+          preview_modal: { page: 1, pageSize: 10 }
         },
 
         showImportModal: false,
@@ -4539,6 +4539,19 @@
           year: '',
           month: ''
         },
+
+        // ✅ Filter Cache สำหรับลด re-computation ที่ไม่จำเป็น
+        _filterCache: {
+          generalWaste: null,
+          subdistrictRecords: null,
+          infHazRecords: null,
+          disposalDetails: null,
+          disposalHistory: null,
+          _version: 0
+        },
+        _filterVersion: 0,       // เพิ่มค่าทุกครั้งที่ filter หรือข้อมูลเปลี่ยน
+        _debounceTimer: null,    // สำหรับ keyword debounce
+        isFiltering: false,      // แสดง skeleton ขณะ filter
 
         refBins: [],
         refDepartments: [],
@@ -4809,6 +4822,7 @@
           this.filters.endDate = '';
           this.filters.year = '';
           this.filters.month = '';
+          this.invalidateFilterCache();
           this.recalculateAllStats();
           Swal.fire({ title: 'แสดงข้อมูลทั้งหมด (All Data)', icon: 'success', timer: 800, showConfirmButton: false });
         },
@@ -4838,6 +4852,7 @@
             this.resetAllFilters();
             return;
           }
+          this.invalidateFilterCache();
           this.recalculateAllStats();
           Swal.fire({
             title: 'ตั้งค่าตัวกรองสำเร็จ',
@@ -5445,6 +5460,7 @@
           if (this.isDbConnected && this.sbClient) {
             await this.fetchAllDataFromSupabase();
           } else {
+            this.invalidateFilterCache();
             this.recalculateAllStats();
             this.showLoader(false);
           }
@@ -5671,13 +5687,119 @@
         },
 
         async onUserLoggedIn() {
-          this.showLoader(true, 'กำลังสืบค้นฐานข้อมูล...');
+          // ✅ Fast Login: เข้าสู่ระบบทันที ไม่รอข้อมูล
+          this.showLoader(false);
+
           if (this.dbConfig.url && this.dbConfig.anonKey) {
-            await this.connectSupabase(true);
+            // เชื่อมต่อ Supabase ใน background แบบไม่ block UI
+            this.connectAndLoadBackground();
           } else {
             this.initMockDatabase();
             this.recalculateAllStats();
-            this.showLoader(false);
+          }
+        },
+
+        async connectAndLoadBackground() {
+          // แสดง toast เล็กๆ แทน full-screen loader
+          const toastEl = Swal.mixin({
+            toast: true,
+            position: 'bottom-end',
+            showConfirmButton: false,
+            timer: 0,
+            timerProgressBar: false,
+            background: '#0f172a',
+            color: '#94a3b8',
+            customClass: { popup: 'border border-slate-700 rounded-2xl shadow-xl !text-xs' }
+          });
+
+          try {
+            this.sbClient = supabase.createClient(this.dbConfig.url, this.dbConfig.anonKey);
+
+            // ---- ขั้นที่ 1: ตรวจสอบการเชื่อมต่อ + โหลด ref tables (เล็ก, เร็ว) ----
+            toastEl.fire({ icon: 'info', title: '🔗 กำลังเชื่อมต่อฐานข้อมูล...' });
+
+            const [binsRes, deptsRes, companiesRes] = await Promise.all([
+              this.sbClient.from('ref_bins').select('*'),
+              this.sbClient.from('ref_departments').select('*'),
+              this.sbClient.from('ref_companies').select('*')
+            ]);
+
+            if (binsRes.error) throw binsRes.error;
+
+            this.refBins = binsRes.data || [];
+            this.refDepartments = deptsRes.data || [];
+            this.refCompanies = companiesRes.data || [];
+            this.isDbConnected = true;
+            this.showDbConfigModal = false;
+
+            localStorage.setItem('sb_url', this.dbConfig.url);
+            localStorage.setItem('sb_anon', this.dbConfig.anonKey);
+
+            // ---- ขั้นที่ 2: โหลด data tables แบบ parallel ทั้งหมดพร้อมกัน ----
+            toastEl.fire({ icon: 'info', title: '📥 กำลังโหลดข้อมูล...' });
+
+            const loadTableParallel = async (tableName) => {
+              try {
+                let allRows = [];
+                let from = 0;
+                const step = 1000;
+                let hasMore = true;
+
+                while (hasMore) {
+                  const { data, error } = await this.sbClient
+                    .from(tableName)
+                    .select('*')
+                    .range(from, from + step - 1);
+
+                  if (error) throw error;
+                  if (data && data.length > 0) {
+                    allRows.push(...data);
+                    hasMore = data.length >= step;
+                    from += step;
+                  } else {
+                    hasMore = false;
+                  }
+                }
+                return allRows;
+              } catch (err) {
+                console.warn(`ล้มเหลวในการโหลดตาราง: ${tableName}`, err);
+                return [];
+              }
+            };
+
+            // โหลดทุกตารางพร้อมกัน (parallel)
+            const [genWaste, subdistricts, disposal, disposalHist, infHaz] = await Promise.all([
+              loadTableParallel('general_waste'),
+              loadTableParallel('infectious_subdistricts'),
+              loadTableParallel('infectious_disposal'),
+              loadTableParallel('infectious_disposal_history'),
+              loadTableParallel('infectious_hazardous_waste')
+            ]);
+
+            this.generalWasteRecords = genWaste;
+            this.subdistrictRecords = subdistricts;
+            this.disposalDetails = disposal;
+            this.disposalHistory = disposalHist;
+            this.infHazRecords = infHaz;
+
+            this.invalidateFilterCache();
+            this.recalculateAllStats();
+            this.checkAutoDailyRunOnLogin();
+
+            if (this.currentTab === 'dashboard') {
+              this.$nextTick(() => {
+                setTimeout(() => { this.drawDashboardCharts(); }, 200);
+              });
+            }
+
+            toastEl.fire({ icon: 'success', title: '✅ โหลดข้อมูลเสร็จสมบูรณ์', timer: 2000 });
+
+          } catch (err) {
+            console.error('Supabase connection/load error:', err);
+            this.isDbConnected = false;
+            this.initMockDatabase();
+            this.recalculateAllStats();
+            toastEl.fire({ icon: 'error', title: '⚠️ เชื่อมต่อฐานข้อมูลล้มเหลว', timer: 3000 });
           }
         },
 
@@ -5974,9 +6096,9 @@
 
         async fetchAllDataFromSupabase() {
           if (!this.isDbConnected || !this.sbClient) return;
-          this.showLoader(true, 'กำลังดึงข้อมูลทั้งหมดจาก Supabase...');
+          this.showLoader(true, 'กำลังอัปเดตข้อมูลจาก Supabase...');
 
-          const loadTable = async (tableName, stateProperty) => {
+          const loadTableParallel = async (tableName) => {
             try {
               let allRows = [];
               let from = 0;
@@ -5992,41 +6114,41 @@
                 if (error) throw error;
                 if (data && data.length > 0) {
                   allRows.push(...data);
-                  if (data.length < step) {
-                    hasMore = false;
-                  } else {
-                    from += step;
-                  }
+                  hasMore = data.length >= step;
+                  from += step;
                 } else {
                   hasMore = false;
                 }
               }
-
-              this[stateProperty] = allRows;
+              return allRows;
             } catch (err) {
-              console.warn(`ล้มเหลวในการดาวน์โหลดตาราง: ${tableName}`, err);
-              this[stateProperty] = [];
-              Swal.fire({
-                title: `พบปัญหาในตาราง '${tableName}'`,
-                html: `<div class="text-left text-xs bg-slate-900 p-2.5 rounded border border-slate-800 text-red-400 font-mono">
-                  <strong>ความผิดพลาด:</strong> ${err.message || err.code || err}<br>
-                  <strong>สาเหตุ:</strong> ตารางนี้อาจจะยังไม่มีข้อมูล มีความขัดแย้งของหัวตาราง หรือติดนโยบาย RLS
-                </div>`,
-                icon: 'warning',
-                confirmButtonText: 'รับทราบ'
-              });
+              console.warn(`ล้มเหลวในการโหลดตาราง: ${tableName}`, err);
+              return null; // null = error (แยกจาก [] = ว่างเปล่า)
             }
           };
 
-          await loadTable('ref_bins', 'refBins');
-          await loadTable('ref_departments', 'refDepartments');
-          await loadTable('ref_companies', 'refCompanies');
-          await loadTable('general_waste', 'generalWasteRecords');
-          await loadTable('infectious_subdistricts', 'subdistrictRecords');
-          await loadTable('infectious_disposal', 'disposalDetails');
-          await loadTable('infectious_disposal_history', 'disposalHistory');
-          await loadTable('infectious_hazardous_waste', 'infHazRecords');
+          // โหลดทุกตารางพร้อมกัน (parallel)
+          const [bins, depts, companies, genWaste, subdistricts, disposal, disposalHist, infHaz] = await Promise.all([
+            loadTableParallel('ref_bins'),
+            loadTableParallel('ref_departments'),
+            loadTableParallel('ref_companies'),
+            loadTableParallel('general_waste'),
+            loadTableParallel('infectious_subdistricts'),
+            loadTableParallel('infectious_disposal'),
+            loadTableParallel('infectious_disposal_history'),
+            loadTableParallel('infectious_hazardous_waste')
+          ]);
 
+          if (bins !== null) this.refBins = bins;
+          if (depts !== null) this.refDepartments = depts;
+          if (companies !== null) this.refCompanies = companies;
+          if (genWaste !== null) this.generalWasteRecords = genWaste;
+          if (subdistricts !== null) this.subdistrictRecords = subdistricts;
+          if (disposal !== null) this.disposalDetails = disposal;
+          if (disposalHist !== null) this.disposalHistory = disposalHist;
+          if (infHaz !== null) this.infHazRecords = infHaz;
+
+          this.invalidateFilterCache();
           this.recalculateAllStats();
           this.showLoader(false);
           this.checkAutoDailyRunOnLogin();
@@ -6293,7 +6415,37 @@
           return 'morning';
         },
 
+        // ✅ Invalidate cache ทุกครั้งที่ข้อมูลหรือ filter เปลี่ยน
+        invalidateFilterCache() {
+          this._filterVersion++;
+          this._filterCache = {
+            generalWaste: null,
+            subdistrictRecords: null,
+            infHazRecords: null,
+            disposalDetails: null,
+            disposalHistory: null,
+            _version: this._filterVersion
+          };
+          // Reset pagination page 1 ทุก tab เมื่อ filter เปลี่ยน
+          Object.keys(this.pagination).forEach(k => { this.pagination[k].page = 1; });
+        },
+
+        // ✅ Debounce สำหรับ keyword search — รอ 300ms หลังพิมพ์หยุด
+        debouncedKeywordFilter() {
+          clearTimeout(this._debounceTimer);
+          this.isFiltering = true;
+          this._debounceTimer = setTimeout(() => {
+            this.invalidateFilterCache();
+            this.recalculateAllStats();
+            this.isFiltering = false;
+          }, 300);
+        },
+
         filteredGeneralWaste() {
+          // Return cache ถ้ายังใช้งานได้
+          if (this._filterCache.generalWaste !== null && this._filterCache._version === this._filterVersion) {
+            return this._filterCache.generalWaste;
+          }
           const list = (this.generalWasteRecords || []).filter(g => {
             const matchCommon = this.matchCommonFilters(g.waste_date, g.year, g.month, g.department_id, g);
             if (!matchCommon) return false;
@@ -6303,37 +6455,59 @@
             }
             return true;
           });
-          return this.sortRecordsDesc(list, ['waste_date', 'created_at']);
+          const result = this.sortRecordsDesc(list, ['waste_date', 'created_at']);
+          this._filterCache.generalWaste = result;
+          this._filterCache._version = this._filterVersion;
+          return result;
         },
 
         filteredSubdistrictRecords() {
+          if (this._filterCache.subdistrictRecords !== null && this._filterCache._version === this._filterVersion) {
+            return this._filterCache.subdistrictRecords;
+          }
           const list = (this.subdistrictRecords || []).filter(s => {
             return this.matchCommonFilters(s.received_date, s.year, s.month, null, s);
           });
-          return this.sortRecordsDesc(list, ['received_date', 'created_at']);
+          const result = this.sortRecordsDesc(list, ['received_date', 'created_at']);
+          this._filterCache.subdistrictRecords = result;
+          return result;
         },
 
         filteredInfHazRecords() {
+          if (this._filterCache.infHazRecords !== null && this._filterCache._version === this._filterVersion) {
+            return this._filterCache.infHazRecords;
+          }
           const list = (this.infHazRecords || []).filter(h => {
             return this.matchCommonFilters(h.waste_date, h.year, h.month, null, h);
           });
-          return this.sortRecordsDesc(list, ['waste_date', 'created_at']);
+          const result = this.sortRecordsDesc(list, ['waste_date', 'created_at']);
+          this._filterCache.infHazRecords = result;
+          return result;
         },
 
         filteredDisposalDetails() {
+          if (this._filterCache.disposalDetails !== null && this._filterCache._version === this._filterVersion) {
+            return this._filterCache.disposalDetails;
+          }
           const list = (this.disposalDetails || []).filter(d => {
             return this.matchCommonFilters(d.created_date, null, null, null, d);
           });
-          return this.sortRecordsDesc(list, ['created_date', 'created_at']);
+          const result = this.sortRecordsDesc(list, ['created_date', 'created_at']);
+          this._filterCache.disposalDetails = result;
+          return result;
         },
 
         filteredDisposalHistory() {
+          if (this._filterCache.disposalHistory !== null && this._filterCache._version === this._filterVersion) {
+            return this._filterCache.disposalHistory;
+          }
           const list = (this.disposalHistory || []).filter(h => {
-            // Use created_date if available; fallback to created_at for ISO timestamp records
             const dateStr = h.created_date || (h.created_at ? String(h.created_at).split('T')[0] : null);
             return this.matchCommonFilters(dateStr, null, null, null, h);
           });
-          return this.sortRecordsDesc(list, ['created_date', 'created_at']);
+          const result = this.sortRecordsDesc(list, ['created_date', 'created_at']);
+          this._filterCache.disposalHistory = result;
+          return result;
         },
 
         recalculateAllStats() {
@@ -6550,6 +6724,7 @@
         },
 
         applyFilters() {
+          this.invalidateFilterCache();
           this.recalculateAllStats();
           if (this.currentTab === 'dashboard') {
             this.$nextTick(() => {
