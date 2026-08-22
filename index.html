@@ -1188,16 +1188,79 @@
             </div>
           </div>
 
-          <!-- CHART 4: สถิติมูลฝอยทั่วไปและอินทรีย์แยกตามแผนก รพ. -->
-          <div class="bg-[#0f172a] p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-md">
-            <div class="flex items-center justify-between mb-3 sm:mb-4">
+          <!-- CHART 4: สถิติมูลฝอยทั่วไปและอินทรีย์แยกตามแผนก รพ. (ออกแบบใหม่ แยกประเภท & จัดอันดับ) -->
+          <div class="bg-[#0f172a] p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-md space-y-3.5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
               <div>
-                <h4 class="text-xs sm:text-sm font-bold text-slate-100">สถิติมูลฝอยทั่วไปและอินทรีย์แยกตามแผนกภายใน รพ. (น้อยไปหามาก)</h4>
-                <p class="text-[10px] text-slate-400">วิเคราะห์เพื่อลดขยะต้นทาง (Source Reduction) ตามหลัก 3Rs</p>
+                <div class="flex items-center gap-2">
+                  <div class="p-1.5 bg-violet-500/10 border border-violet-500/30 text-violet-400 rounded-lg">
+                    <i class="fa-solid fa-chart-simple text-sm"></i>
+                  </div>
+                  <h4 class="text-xs sm:text-sm font-bold text-slate-100">สถิติมูลฝอยทั่วไปและขยะอินทรีย์แยกตามแผนกภายใน รพ.</h4>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-0.5">วิเคราะห์เปรียบเทียบขยะทั่วไปและขยะอินทรีย์รายแผนก เพื่อการลดขยะต้นทางตามหลัก 3Rs</p>
               </div>
-              <i class="fa-solid fa-chart-bar text-violet-400"></i>
+              
+              <!-- FILTER CONTROLS -->
+              <div class="flex flex-wrap items-center gap-2 text-xs">
+                <!-- Limit: Top 10, Top 15, Top 20, ทั้งหมด -->
+                <div class="flex items-center gap-1 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800 shadow-sm">
+                  <span class="text-[10px] text-slate-400">แสดง:</span>
+                  <select x-model="deptWasteChartFilter.limit" @change="drawDashboardCharts()" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
+                    <option value="top10">Top 10</option>
+                    <option value="top15">Top 15</option>
+                    <option value="top20">Top 20</option>
+                    <option value="all">ทุกแผนก</option>
+                  </select>
+                </div>
+
+                <!-- Sort: มากไปน้อย, น้อยไปมาก -->
+                <div class="flex items-center gap-1 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800 shadow-sm">
+                  <span class="text-[10px] text-slate-400">เรียง:</span>
+                  <select x-model="deptWasteChartFilter.sort" @change="drawDashboardCharts()" class="bg-transparent text-sky-400 font-semibold focus:outline-none cursor-pointer text-xs">
+                    <option value="desc">มาก ➔ น้อย</option>
+                    <option value="asc">น้อย ➔ มาก</option>
+                  </select>
+                </div>
+
+                <!-- Type: ทั้ง 2 ชนิด, เฉพาะทั่วไป, เฉพาะอินทรีย์ -->
+                <div class="flex items-center gap-1 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800 shadow-sm">
+                  <span class="text-[10px] text-slate-400">ประเภท:</span>
+                  <select x-model="deptWasteChartFilter.type" @change="drawDashboardCharts()" class="bg-transparent text-amber-400 font-semibold focus:outline-none cursor-pointer text-xs">
+                    <option value="both">ทั่วไป + อินทรีย์</option>
+                    <option value="general">เฉพาะขยะทั่วไป</option>
+                    <option value="organic">เฉพาะขยะอินทรีย์</option>
+                  </select>
+                </div>
+
+                <!-- Display Mode: Stacked / Grouped -->
+                <div x-show="deptWasteChartFilter.type === 'both'" class="flex items-center gap-1 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800 shadow-sm" x-cloak>
+                  <span class="text-[10px] text-slate-400">รูปแบบ:</span>
+                  <select x-model="deptWasteChartFilter.mode" @change="drawDashboardCharts()" class="bg-transparent text-purple-400 font-semibold focus:outline-none cursor-pointer text-xs">
+                    <option value="stacked">แท่งซ้อน (Stacked)</option>
+                    <option value="grouped">แท่งคู่ (Grouped)</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div class="relative h-64 sm:h-80 w-full">
+
+            <!-- Custom Legend Badges -->
+            <div class="flex items-center justify-between flex-wrap gap-2 text-[11px] pt-0.5">
+              <div class="flex items-center gap-3">
+                <span x-show="deptWasteChartFilter.type === 'both' || deptWasteChartFilter.type === 'general'" class="inline-flex items-center gap-1.5 font-medium text-blue-300">
+                  <span class="w-3 h-3 rounded-md bg-blue-500 shadow-sm inline-block"></span>
+                  <span>ขยะทั่วไป (กก.)</span>
+                </span>
+                <span x-show="deptWasteChartFilter.type === 'both' || deptWasteChartFilter.type === 'organic'" class="inline-flex items-center gap-1.5 font-medium text-emerald-300">
+                  <span class="w-3 h-3 rounded-md bg-emerald-500 shadow-sm inline-block"></span>
+                  <span>ขยะอินทรีย์ (กก.)</span>
+                </span>
+              </div>
+              <span class="text-[10px] text-slate-400 italic">* ชี้ที่แท่งกราฟเพื่อดูปริมาณขยะและสัดส่วนรายแผนก</span>
+            </div>
+
+            <!-- Chart Canvas with dynamic height -->
+            <div class="relative w-full" :class="deptWasteChartFilter.limit === 'all' ? 'h-[650px] overflow-y-auto' : (deptWasteChartFilter.limit === 'top20' ? 'h-[520px]' : (deptWasteChartFilter.limit === 'top15' ? 'h-[440px]' : 'h-80 sm:h-96'))">
               <canvas id="departmentBarChart"></canvas>
             </div>
           </div>
@@ -1475,10 +1538,15 @@
                   <i class="fa-solid fa-list-check text-rose-400"></i> ระบุจำนวนขยะราย รพ.สต. (กิโลกรัม)
                 </h4>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5">
-                  <template x-for="field in subdistrictFields">
-                    <div class="bg-slate-950/60 p-2 sm:p-2.5 rounded-xl border border-slate-800">
-                      <label class="block text-[10px] sm:text-[11px] font-bold text-slate-400 mb-1 truncate" x-text="field.label"></label>
-                      <input type="number" step="0.01" x-model.number="subForm[field.key]" class="w-full text-xs bg-slate-900 border border-slate-700/80 rounded-lg px-2 py-1.5 text-right text-slate-100 focus:outline-none focus:ring-1 focus:ring-rose-500">
+                  <template x-for="field in subdistrictFields" :key="field.key">
+                    <div class="bg-slate-950/70 p-2 sm:p-2.5 rounded-xl border border-slate-800/90 shadow-sm hover:border-slate-700 transition">
+                      <label class="block text-[10px] sm:text-[11px] font-bold mb-1 truncate flex items-center gap-1.5" :class="field.textColor" :title="field.label">
+                        <span class="inline-block w-2 h-2 rounded-full shrink-0 shadow-sm" :style="`background-color: ${field.color}`"></span>
+                        <span x-text="field.label"></span>
+                      </label>
+                      <input type="number" step="0.01" x-model.number="subForm[field.key]" placeholder="0.00"
+                             class="w-full text-xs font-mono font-bold bg-slate-900 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-right focus:outline-none focus:ring-1"
+                             :class="[field.textColor, field.borderHover || 'focus:ring-rose-500']">
                     </div>
                   </template>
                 </div>
@@ -1508,58 +1576,27 @@
             </div>
             <div class="table-container border border-slate-800">
               <table id="subdistricts_table" class="w-full text-[10px] sm:text-[11px] text-left border-collapse whitespace-nowrap">
-                <thead class="sticky-header text-slate-400 font-bold border-b border-slate-800">
+                <thead class="sticky-header border-b border-slate-800 bg-[#0f172a]/95 text-slate-300">
                   <tr>
-                    <th class="p-2.5">วันที่รับ</th>
-                    <th class="p-2.5">กระโสบ</th>
-                    <th class="p-2.5">ปากน้ำ</th>
-                    <th class="p-2.5">ผาแก้ว</th>
-                    <th class="p-2.5">ดงแสนสุข</th>
-                    <th class="p-2.5">ดงห่องแห่</th>
-                    <th class="p-2.5">ปทุม</th>
-                    <th class="p-2.5">ตำแย</th>
-                    <th class="p-2.5">ทัพไทย</th>
-                    <th class="p-2.5">หนองแก</th>
-                    <th class="p-2.5">หนองบ่อ</th>
-                    <th class="p-2.5">ดงบัง</th>
-                    <th class="p-2.5">ปะอาว</th>
-                    <th class="p-2.5">หนองขอน</th>
-                    <th class="p-2.5">หนองไหล</th>
-                    <th class="p-2.5">หนองแต้</th>
-                    <th class="p-2.5">หัวเรือ</th>
-                    <th class="p-2.5">หัวดูน</th>
-                    <th class="p-2.5">ด้ามพร้า</th>
-                    <th class="p-2.5">ขามใหญ่</th>
-                    <th class="p-2.5">ยางลุ่ม</th>
-                    <th class="p-2.5">PCU50</th>
-                    <th class="p-2.5 text-center" x-show="isAdmin()">จัดการ</th>
+                    <th class="p-2.5 text-slate-200 font-bold">วันที่รับ</th>
+                    <template x-for="field in subdistrictFields" :key="field.key">
+                      <th class="p-2.5 text-right font-bold whitespace-nowrap text-slate-300" :title="field.label">
+                        <span class="inline-block w-1.5 h-1.5 rounded-full mr-0.5 align-middle shadow-sm" :style="`background-color: ${field.color}`"></span>
+                        <span x-text="field.label"></span>
+                      </th>
+                    </template>
+                    <th class="p-2.5 text-center font-bold text-slate-400" x-show="isAdmin()">จัดการ</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-800/80">
-                  <template x-for="item in getPagedData(filteredSubdistrictRecords(), 'subdistrict_waste')">
-                    <tr class="hover:bg-slate-800/40 transition">
-                      <td class="p-2.5 font-semibold text-slate-300" x-text="formatDate(item.received_date)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.krasob)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.paknam)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.phakaew)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.dongsaensuk)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.donghonghae)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.pathum)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.tamyae)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.thapthai)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.nonggae)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.nongbo)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.dongbang)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.paao)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.nongkhon)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.nonglai)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.nongtae)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.huarua)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.huadun)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.damphra)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.khamyai)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.yanglum)"></td>
-                      <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.pcu50)"></td>
+                  <template x-for="(item, index) in getPagedData(filteredSubdistrictRecords(), 'subdistrict_waste')" :key="item.id || index">
+                    <tr class="transition" :class="[getSubdistrictRowColor(index).hoverBg || 'hover:bg-slate-800/40']">
+                      <td class="p-2.5 font-bold whitespace-nowrap" :class="getSubdistrictRowColor(index).text" x-text="formatDate(item.received_date)"></td>
+                      <template x-for="field in subdistrictFields" :key="field.key">
+                        <td class="p-2.5 text-right font-mono font-bold whitespace-nowrap"
+                            :class="Number(item[field.key]) > 0 ? getSubdistrictRowColor(index).text : 'text-slate-600'"
+                            x-text="formatNumber(item[field.key])"></td>
+                      </template>
                       <td class="p-2.5 text-center space-x-1" x-show="isAdmin()">
                         <button @click="editSubdistrict(item)" class="text-blue-400 hover:bg-blue-950/60 rounded p-1 transition" title="แก้ไข"><i class="fa-solid fa-pen-to-square"></i></button>
                         <button @click="deleteRecord('infectious_subdistricts', item.id)" class="text-rose-400 hover:bg-rose-950/60 rounded p-1 transition" title="ลบ"><i class="fa-solid fa-trash"></i></button>
@@ -2280,9 +2317,9 @@
                     <th class="p-3">บริษัทที่มารับไปกำจัด</th>
                     <th class="p-3">ลงชื่อผู้ส่ง</th>
                     <th class="p-3">ลงชื่อผู้บันทึก</th>
+                    <th class="p-3 text-center">ลิงค์ข้อมูลการชั่งน้ำหนัก (ตช.สำหรับ รพ.)</th>
                     <th class="p-3 text-center">รูปภาพประกอบ1</th>
                     <th class="p-3 text-center">รูปภาพประกอบ2</th>
-                    <th class="p-3 text-center">ลิงค์ข้อมูลการชั่งน้ำหนัก (ตช.สำหรับ รพ.)</th>
                     <th class="p-3">เวลาบันทึก</th>
                     <th class="p-3 text-center font-bold">จัดการ</th>
                   </tr>
@@ -2314,6 +2351,17 @@
                       <td class="p-3 text-slate-300" x-text="hist.sender_name || 'แสงตะวัน ชาวเขา'"></td>
                       <td class="p-3 text-slate-300" x-text="hist.recorded_by || 'แสงตะวัน ชาวเขา'"></td>
                       <td class="p-3 text-center">
+                        <template x-if="hist.weighing_link">
+                          <a :href="hist.weighing_link" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] bg-blue-950/80 hover:bg-blue-900 text-blue-300 border border-blue-800/60 rounded-lg transition" title="เปิดลิงก์ข้อมูลการชั่งน้ำหนัก">
+                            <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                            <span>ตช.รพ.</span>
+                          </a>
+                        </template>
+                        <template x-if="!hist.weighing_link">
+                          <span class="text-[10px] text-slate-600">-</span>
+                        </template>
+                      </td>
+                      <td class="p-3 text-center">
                         <template x-if="hist.photo_url_1">
                           <a :href="hist.photo_url_1" target="_blank" class="inline-block px-2.5 py-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg transition" title="เปิดดูรูปภาพ 1">
                             <i class="fa-solid fa-image mr-0.5"></i> รูป 1
@@ -2330,17 +2378,6 @@
                           </a>
                         </template>
                         <template x-if="!hist.photo_url_2">
-                          <span class="text-[10px] text-slate-600">-</span>
-                        </template>
-                      </td>
-                      <td class="p-3 text-center">
-                        <template x-if="hist.weighing_link">
-                          <a :href="hist.weighing_link" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] bg-blue-950/80 hover:bg-blue-900 text-blue-300 border border-blue-800/60 rounded-lg transition" title="เปิดลิงก์ข้อมูลการชั่งน้ำหนัก">
-                            <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
-                            <span>ตช.รพ.</span>
-                          </a>
-                        </template>
-                        <template x-if="!hist.weighing_link">
                           <span class="text-[10px] text-slate-600">-</span>
                         </template>
                       </td>
@@ -4367,6 +4404,12 @@
         },
         autoGenPreviewRows: [],
         generalWasteShiftFilter: 'all', // 'all', 'morning', 'afternoon'
+        deptWasteChartFilter: {
+          limit: 'top10',   // 'top10', 'top15', 'top20', 'all'
+          sort: 'desc',     // 'desc' (มากไปน้อย), 'asc' (น้อยไปมาก)
+          type: 'both',     // 'both' (ทั่วไป + อินทรีย์), 'general' (ทั่วไป), 'organic' (อินทรีย์)
+          mode: 'stacked'   // 'stacked' (แท่งซ้อน), 'grouped' (แท่งคู่)
+        },
         deptBaselineSearch: '',
         newDeptBaselineForm: {
           name: '',
@@ -4487,27 +4530,27 @@
 
         months: ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'],
         subdistrictFields: [
-          { key: 'krasob', label: 'กระโสบ' },
-          { key: 'paknam', label: 'ปากน้ำ' },
-          { key: 'phakaew', label: 'ผาแก้ว' },
-          { key: 'dongsaensuk', label: 'ดงแสนสุข' },
-          { key: 'donghonghae', label: 'ดงห่องแห่' },
-          { key: 'pathum', label: 'ปทุม' },
-          { key: 'tamyae', label: 'ตำแย' },
-          { key: 'thapthai', label: 'ทัพไทย' },
-          { key: 'nonggae', label: 'หนองแก' },
-          { key: 'nongbo', label: 'หนองบ่อ' },
-          { key: 'dongbang', label: 'ดงบัง' },
-          { key: 'paao', label: 'ปะอาว' },
-          { key: 'nongkhon', label: 'หนองขอน' },
-          { key: 'nonglai', label: 'หนองไหล' },
-          { key: 'nongtae', label: 'หนองแต้' },
-          { key: 'huarua', label: 'หัวเรือ' },
-          { key: 'huadun', label: 'หัวดูน' },
-          { key: 'damphra', label: 'ด้ามพร้า' },
-          { key: 'khamyai', label: 'ขามใหญ่' },
-          { key: 'yanglum', label: 'ยางลุ่ม' },
-          { key: 'pcu50', label: 'PCU50' }
+          { key: 'krasob', label: 'กระโสบ', color: '#f43f5e', textColor: 'text-rose-400', borderHover: 'focus:ring-rose-500' },
+          { key: 'paknam', label: 'ปากน้ำ', color: '#38bdf8', textColor: 'text-sky-400', borderHover: 'focus:ring-sky-500' },
+          { key: 'phakaew', label: 'ผาแก้ว', color: '#34d399', textColor: 'text-emerald-400', borderHover: 'focus:ring-emerald-500' },
+          { key: 'dongsaensuk', label: 'ดงแสนสุข', color: '#fbbf24', textColor: 'text-amber-400', borderHover: 'focus:ring-amber-500' },
+          { key: 'donghonghae', label: 'ดงห่องแห่', color: '#a78bfa', textColor: 'text-violet-400', borderHover: 'focus:ring-violet-500' },
+          { key: 'pathum', label: 'ปทุม', color: '#2dd4bf', textColor: 'text-teal-400', borderHover: 'focus:ring-teal-500' },
+          { key: 'tamyae', label: 'ตำแย', color: '#fb923c', textColor: 'text-orange-400', borderHover: 'focus:ring-orange-500' },
+          { key: 'thapthai', label: 'ทัพไทย', color: '#e879f9', textColor: 'text-fuchsia-400', borderHover: 'focus:ring-fuchsia-500' },
+          { key: 'nonggae', label: 'หนองแก', color: '#22d3ee', textColor: 'text-cyan-400', borderHover: 'focus:ring-cyan-500' },
+          { key: 'nongbo', label: 'หนองบ่อ', color: '#a3e635', textColor: 'text-lime-400', borderHover: 'focus:ring-lime-500' },
+          { key: 'dongbang', label: 'ดงบัง', color: '#f472b6', textColor: 'text-pink-400', borderHover: 'focus:ring-pink-500' },
+          { key: 'paao', label: 'ปะอาว', color: '#818cf8', textColor: 'text-indigo-400', borderHover: 'focus:ring-indigo-500' },
+          { key: 'nongkhon', label: 'หนองขอน', color: '#facc15', textColor: 'text-yellow-400', borderHover: 'focus:ring-yellow-500' },
+          { key: 'nonglai', label: 'หนองไหล', color: '#c084fc', textColor: 'text-purple-400', borderHover: 'focus:ring-purple-500' },
+          { key: 'nongtae', label: 'หนองแต้', color: '#60a5fa', textColor: 'text-blue-400', borderHover: 'focus:ring-blue-500' },
+          { key: 'huarua', label: 'หัวเรือ', color: '#f87171', textColor: 'text-red-400', borderHover: 'focus:ring-red-500' },
+          { key: 'huadun', label: 'หัวดูน', color: '#4ade80', textColor: 'text-green-400', borderHover: 'focus:ring-green-500' },
+          { key: 'damphra', label: 'ด้ามพร้า', color: '#fb7185', textColor: 'text-rose-400', borderHover: 'focus:ring-rose-500' },
+          { key: 'khamyai', label: 'ขามใหญ่', color: '#f59e0b', textColor: 'text-amber-500', borderHover: 'focus:ring-amber-500' },
+          { key: 'yanglum', label: 'ยางลุ่ม', color: '#14b8a6', textColor: 'text-teal-400', borderHover: 'focus:ring-teal-500' },
+          { key: 'pcu50', label: 'PCU50', color: '#d946ef', textColor: 'text-fuchsia-400', borderHover: 'focus:ring-fuchsia-500' }
         ],
 
         currentUser: null,
@@ -4532,6 +4575,22 @@
 
         backupHistory: JSON.parse(localStorage.getItem('hospital_waste_backup_history') || '[]'),
         
+        // ชุดสีแถวตามวันที่ของ รพ.สต. (เหลือง, ม่วง, ฟ้า, เขียว, ชมพู, ส้ม, บานเย็น ฯลฯ)
+        subdistrictRowColors: [
+          { text: 'text-amber-300', hoverBg: 'hover:bg-amber-500/10', color: '#fde047' },     // เหลือง (เช่น 11 ส.ค. 2569)
+          { text: 'text-purple-400', hoverBg: 'hover:bg-purple-500/10', color: '#c084fc' },   // ม่วง (เช่น 4 ส.ค. 2569)
+          { text: 'text-sky-400', hoverBg: 'hover:bg-sky-500/10', color: '#38bdf8' },         // ฟ้า (เช่น 28 ก.ค. 2569)
+          { text: 'text-emerald-400', hoverBg: 'hover:bg-emerald-500/10', color: '#34d399' }, // เขียวมรกต (เช่น 21 ก.ค. 2569)
+          { text: 'text-rose-400', hoverBg: 'hover:bg-rose-500/10', color: '#fb7185' },       // ชมพูกุหลาบ (เช่น 14 ก.ค. 2569)
+          { text: 'text-orange-400', hoverBg: 'hover:bg-orange-500/10', color: '#fb923c' },   // ส้มสด (เช่น 7 ก.ค. 2569)
+          { text: 'text-fuchsia-400', hoverBg: 'hover:bg-fuchsia-500/10', color: '#e879f9' }, // ชมพูบานเย็น (เช่น 30 มิ.ย. 2569)
+          { text: 'text-teal-300', hoverBg: 'hover:bg-teal-500/10', color: '#5eead4' },       // ฟ้าอมเขียว (เช่น 23 มิ.ย. 2569)
+          { text: 'text-lime-400', hoverBg: 'hover:bg-lime-500/10', color: '#a3e635' },       // เขียวมะนาว (เช่น 16 มิ.ย. 2569)
+          { text: 'text-indigo-400', hoverBg: 'hover:bg-indigo-500/10', color: '#818cf8' },   // น้ำเงินคราม (เช่น 7 มิ.ย. 2569)
+          { text: 'text-pink-400', hoverBg: 'hover:bg-pink-500/10', color: '#f472b6' },       // ชมพูพาสเทล
+          { text: 'text-cyan-300', hoverBg: 'hover:bg-cyan-500/10', color: '#67e8f9' }        // ฟ้าสว่าง
+        ],
+
         // Universal Filter State (ค้นหาทั่วไป, ประเภทรายงาน, แผนก, วันที่เริ่มต้น, วันที่สิ้นสุด, ปี พ.ศ., เดือน)
         filters: {
           keyword: '',
@@ -5531,7 +5590,7 @@
               'ลงชื่อผู้บันทึก': 'แสงตะวัน ชาวเขา'
             };
           } else if (type === 'infectious_disposal_history') {
-            headers = ['รหัส', 'วันที่', 'เลขที่การมารับขยะติดเชื้อ', 'รวมน้ำหนักที่ชั่งได้', 'รวมหักน้ำหนักถัง', 'น้ำหนักมูลฝอยติดเชื้อรวม', 'คิดเป็นมูลค่าการกำจัด', 'บริษัทที่มารับไปกำจัด', 'ลงชื่อผู้ส่ง', 'ลงชื่อผู้บันทึก', 'รูปภาพประกอบ1', 'รูปภาพประกอบ2', 'ลิงค์ข้อมูลการชั่งน้ำหนัก (ตช.สำหรับ รพ.)', 'เวลาบันทึก'];
+            headers = ['รหัส', 'วันที่', 'เลขที่การมารับขยะติดเชื้อ', 'รวมน้ำหนักที่ชั่งได้', 'รวมหักน้ำหนักถัง', 'น้ำหนักมูลฝอยติดเชื้อรวม', 'คิดเป็นมูลค่าการกำจัด', 'บริษัทที่มารับไปกำจัด', 'ลงชื่อผู้ส่ง', 'ลงชื่อผู้บันทึก', 'ลิงค์ข้อมูลการชั่งน้ำหนัก (ตช.สำหรับ รพ.)', 'รูปภาพประกอบ1', 'รูปภาพประกอบ2', 'เวลาบันทึก'];
             sampleRow = {
               'รหัส': 'HIS-1711167402857-319',
               'วันที่': todayIso,
@@ -5543,9 +5602,9 @@
               'บริษัทที่มารับไปกำจัด': 'บริษัท โชติภูกรณ์พิบูลย์ จำกัด',
               'ลงชื่อผู้ส่ง': 'แสงตะวัน ชาวเขา',
               'ลงชื่อผู้บันทึก': 'แสงตะวัน ชาวเขา',
+              'ลิงค์ข้อมูลการชั่งน้ำหนัก (ตช.สำหรับ รพ.)': 'https://hospital-waste.moph.go.th/report/RCV660102-000001',
               'รูปภาพประกอบ1': 'Images/hospital/disposal-000181.jpg',
               'รูปภาพประกอบ2': 'Images/hospital/disposal-000182.jpg',
-              'ลิงค์ข้อมูลการชั่งน้ำหนัก (ตช.สำหรับ รพ.)': 'https://hospital-waste.moph.go.th/report/RCV660102-000001',
               'เวลาบันทึก': `${todayIso} 10:30:00`
             };
           } else if (type === 'ref_bins') {
@@ -7031,11 +7090,7 @@
                 return Number(total.toFixed(2));
               });
 
-              const colors = [
-                '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6',
-                '#6366f1', '#f97316', '#a855f7', '#06b6d4', '#84cc16', '#10b981', '#059669',
-                '#d97706', '#ea580c', '#e11d48', '#2563eb', '#4f46e5', '#7c3aed', '#db2777'
-              ];
+              const colors = (this.subdistrictFields || []).map(f => f.color || '#3b82f6');
 
               this.rainbowChartInstance = new Chart(ctx3, {
                 type: 'bar',
@@ -7079,7 +7134,7 @@
             }
           }
 
-          // 6. DEPARTMENT BAR CHART (สถิติมูลฝอยทั่วไปและอินทรีย์แยกตามแผนกภายใน รพ. - น้อยไปหามาก)
+          // 6. DEPARTMENT BAR CHART (สถิติมูลฝอยทั่วไปและอินทรีย์แยกตามแผนกภายใน รพ. - ออกแบบใหม่ แยกประเภท & จัดอันดับ)
           const ctx4 = document.getElementById('departmentBarChart');
           if (ctx4) {
             try {
@@ -7089,74 +7144,206 @@
 
             try {
               const filteredGen = this.filteredGeneralWaste();
-              const deptMap = {};
+              const filterCfg = this.deptWasteChartFilter || { limit: 'top10', sort: 'desc', type: 'both', mode: 'stacked' };
+              
+              const deptDataMap = {};
 
               // 1. Seed with registered departments if available
               if (Array.isArray(this.refDepartments)) {
                 this.refDepartments.forEach(d => {
                   const dName = d.department_name || d.name || String(d.id);
-                  if (dName) deptMap[dName] = 0;
+                  if (dName) deptDataMap[dName] = { general: 0, organic: 0, total: 0 };
                 });
               }
 
-              // 2. Aggregate actual quantities from general waste records
+              // 2. Aggregate general and organic quantities
               filteredGen.forEach(g => {
                 const dep = g.department_id || 'ไม่ระบุแผนก';
-                deptMap[dep] = (deptMap[dep] || 0) + Number(g.general_kg || 0) + Number(g.organic_kg || 0);
+                if (!deptDataMap[dep]) {
+                  deptDataMap[dep] = { general: 0, organic: 0, total: 0 };
+                }
+                const gen = Number(g.general_kg || 0);
+                const org = Number(g.organic_kg || 0);
+                deptDataMap[dep].general += gen;
+                deptDataMap[dep].organic += org;
+                deptDataMap[dep].total += (gen + org);
               });
 
-              let deptsWeights = Object.keys(deptMap).map(name => ({
+              let list = Object.keys(deptDataMap).map(name => ({
                 name: name,
-                weight: Number(deptMap[name].toFixed(2))
+                general: Number(deptDataMap[name].general.toFixed(2)),
+                organic: Number(deptDataMap[name].organic.toFixed(2)),
+                total: Number(deptDataMap[name].total.toFixed(2))
               }));
 
-              // If there are non-zero records, show all departments with waste
-              if (deptsWeights.some(dw => dw.weight > 0)) {
-                deptsWeights = deptsWeights.filter(dw => dw.weight > 0);
+              // Filter out 0 records if there are non-zero records
+              if (list.some(d => d.total > 0)) {
+                if (filterCfg.type === 'general') {
+                  list = list.filter(d => d.general > 0);
+                } else if (filterCfg.type === 'organic') {
+                  list = list.filter(d => d.organic > 0);
+                } else {
+                  list = list.filter(d => d.total > 0);
+                }
               }
 
-              // เรียงจากน้อยไปหามาก (Ascending) ตามที่ระบุ
-              deptsWeights.sort((a, b) => a.weight - b.weight);
+              // Sorting
+              list.sort((a, b) => {
+                let valA = a.total;
+                let valB = b.total;
+                if (filterCfg.type === 'general') { valA = a.general; valB = b.general; }
+                else if (filterCfg.type === 'organic') { valA = a.organic; valB = b.organic; }
+                
+                // Note: For Chart.js horizontal bar (indexAxis: 'y'), first item in array is drawn at top
+                return filterCfg.sort === 'asc' ? (valA - valB) : (valB - valA);
+              });
 
-              if (deptsWeights.length === 0) {
-                deptsWeights = [{ name: 'ไม่มีข้อมูลหน่วยงาน', weight: 0 }];
+              // Apply limit (top10, top15, top20, all)
+              if (filterCfg.limit === 'top10') list = list.slice(0, 10);
+              else if (filterCfg.limit === 'top15') list = list.slice(0, 15);
+              else if (filterCfg.limit === 'top20') list = list.slice(0, 20);
+
+              if (list.length === 0) {
+                list = [{ name: 'ไม่มีข้อมูลหน่วยงาน', general: 0, organic: 0, total: 0 }];
+              }
+
+              const isBoth = filterCfg.type === 'both';
+              const isStacked = isBoth && filterCfg.mode !== 'grouped';
+
+              let datasets = [];
+
+              if (filterCfg.type === 'both') {
+                datasets = [
+                  {
+                    label: 'ขยะทั่วไป (กก.)',
+                    data: list.map(d => d.general),
+                    backgroundColor: '#3b82f6',
+                    hoverBackgroundColor: '#60a5fa',
+                    borderRadius: isStacked ? 0 : 6,
+                    borderSkipped: false,
+                    stack: isStacked ? 'wasteStack' : undefined,
+                    barPercentage: isStacked ? 0.75 : 0.85,
+                    categoryPercentage: 0.85
+                  },
+                  {
+                    label: 'ขยะอินทรีย์ (กก.)',
+                    data: list.map(d => d.organic),
+                    backgroundColor: '#10b981',
+                    hoverBackgroundColor: '#34d399',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    stack: isStacked ? 'wasteStack' : undefined,
+                    barPercentage: isStacked ? 0.75 : 0.85,
+                    categoryPercentage: 0.85
+                  }
+                ];
+              } else if (filterCfg.type === 'general') {
+                datasets = [{
+                  label: 'ขยะทั่วไป (กก.)',
+                  data: list.map(d => d.general),
+                  backgroundColor: '#3b82f6',
+                  hoverBackgroundColor: '#60a5fa',
+                  borderRadius: 6,
+                  barPercentage: 0.7,
+                  categoryPercentage: 0.85
+                }];
+              } else {
+                datasets = [{
+                  label: 'ขยะอินทรีย์ (กก.)',
+                  data: list.map(d => d.organic),
+                  backgroundColor: '#10b981',
+                  hoverBackgroundColor: '#34d399',
+                  borderRadius: 6,
+                  barPercentage: 0.7,
+                  categoryPercentage: 0.85
+                }];
               }
 
               this.deptChartInstance = new Chart(ctx4, {
                 type: 'bar',
                 data: {
-                  labels: deptsWeights.map(dw => dw.name),
-                  datasets: [{ 
-                    label: 'น้ำหนักสะสม (กก.)', 
-                    data: deptsWeights.map(dw => dw.weight), 
-                    backgroundColor: '#8b5cf6', 
-                    hoverBackgroundColor: '#a78bfa',
-                    borderRadius: 4 
-                  }]
+                  labels: list.map(d => d.name),
+                  datasets: datasets
                 },
                 options: {
-                  indexAxis: 'y', 
-                  responsive: true, 
+                  indexAxis: 'y',
+                  responsive: true,
                   maintainAspectRatio: false,
+                  interaction: {
+                    mode: 'index',
+                    intersect: false
+                  },
                   plugins: {
                     legend: { display: false },
+                    tooltip: {
+                      backgroundColor: '#0f172a',
+                      titleColor: '#f8fafc',
+                      bodyColor: '#cbd5e1',
+                      borderColor: '#334155',
+                      borderWidth: 1,
+                      padding: 10,
+                      boxPadding: 4,
+                      usePointStyle: true,
+                      callbacks: {
+                        label: function(context) {
+                          const val = Number(context.raw || 0).toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                          return ` ${context.dataset.label}: ${val} กก.`;
+                        },
+                        footer: function(tooltipItems) {
+                          if (tooltipItems.length > 1) {
+                            let sum = 0;
+                            tooltipItems.forEach(ti => { sum += Number(ti.raw || 0); });
+                            return ` รวมทั้งหมด: ${sum.toLocaleString('th-TH', {minimumFractionDigits: 2, maximumFractionDigits: 2})} กก.`;
+                          }
+                          return '';
+                        }
+                      }
+                    },
                     datalabels: {
-                      anchor: 'end', align: 'right',
-                      formatter: (value) => Number(value) > 0 ? Number(value).toLocaleString('th-TH', {minimumFractionDigits: 2}) : '',
-                      font: { size: 10, family: 'Kanit', weight: 'bold' }, 
-                      color: '#c4b5fd'
+                      display: (context) => {
+                        const val = Number(context.dataset.data[context.dataIndex] || 0);
+                        if (val <= 0) return false;
+                        if (isStacked) {
+                          // In stacked mode, only show the total label on the top layer or if only one item exists
+                          return context.datasetIndex === datasets.length - 1;
+                        }
+                        return true;
+                      },
+                      anchor: 'end',
+                      align: 'right',
+                      offset: 4,
+                      formatter: (value, context) => {
+                        if (isStacked) {
+                          const idx = context.dataIndex;
+                          const total = list[idx] ? list[idx].total : value;
+                          return Number(total) > 0 ? Number(total).toLocaleString('th-TH', {minimumFractionDigits: 1, maximumFractionDigits: 2}) : '';
+                        }
+                        return Number(value) > 0 ? Number(value).toLocaleString('th-TH', {minimumFractionDigits: 1, maximumFractionDigits: 2}) : '';
+                      },
+                      font: { size: 10, family: 'Kanit', weight: 'bold' },
+                      color: isStacked ? '#e2e8f0' : '#cbd5e1'
                     }
                   },
-                  scales: { 
-                    x: { 
-                      beginAtZero: true, 
-                      grace: '20%',
+                  scales: {
+                    x: {
+                      stacked: isStacked,
+                      beginAtZero: true,
+                      grace: '18%',
                       grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                      ticks: { color: '#94a3b8' }
+                      ticks: { 
+                        color: '#94a3b8', 
+                        font: { size: 10 },
+                        callback: (v) => Number(v) >= 1000 ? (v / 1000).toLocaleString() + 'k' : v
+                      }
                     },
                     y: {
+                      stacked: isStacked,
                       grid: { display: false },
-                      ticks: { color: '#cbd5e1', font: { size: 10 } }
+                      ticks: { 
+                        color: '#cbd5e1', 
+                        font: { size: 11, family: 'Kanit' },
+                        autoSkip: false
+                      }
                     }
                   }
                 }
@@ -10576,6 +10763,12 @@
           reader.readAsArrayBuffer(file);
         },
 
+        getSubdistrictRowColor(rowIndex) {
+          const colors = this.subdistrictRowColors || [];
+          if (!colors.length) return { text: 'text-amber-300', hoverBg: 'hover:bg-amber-500/10', color: '#fde047' };
+          return colors[Math.abs(rowIndex) % colors.length];
+        },
+
         formatNumber(val) {
           const num = parseFloat(val);
           if (isNaN(num)) return '0.00';
@@ -10917,9 +11110,9 @@
               'บริษัทที่มารับไปกำจัด': h.company_name || '',
               'ลงชื่อผู้ส่ง': h.sender_name || 'แสงตะวัน ชาวเขา',
               'ลงชื่อผู้บันทึก': h.recorded_by || 'แสงตะวัน ชาวเขา',
+              'ลิงค์ข้อมูลการชั่งน้ำหนัก (ตช.สำหรับ รพ.)': h.weighing_link || '',
               'รูปภาพประกอบ1': h.photo_url_1 || '',
               'รูปภาพประกอบ2': h.photo_url_2 || '',
-              'ลิงค์ข้อมูลการชั่งน้ำหนัก (ตช.สำหรับ รพ.)': h.weighing_link || '',
               'เวลาบันทึก': this.formatDateTime(h.created_at || h.created_date, h.disposal_no)
             }));
           }
