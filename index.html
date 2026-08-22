@@ -1824,7 +1824,7 @@
                         <th class="p-2.5 text-right">ชั่งได้</th>
                         <th class="p-2.5 text-right text-emerald-400">สุทธิ</th>
                         <th class="p-2.5 text-right text-amber-400">มูลค่า</th>
-                        <th class="p-2.5 text-center">ลบ</th>
+                        <th class="p-2.5 text-center">จัดการ</th>
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-800/80">
@@ -1834,11 +1834,14 @@
                             <span x-text="item.binName"></span>
                             <span class="text-[9px] text-slate-500 block font-normal" x-text="formatDate(item.received_date)"></span>
                           </td>
-                          <td class="p-2.5 text-right text-slate-300" x-text="formatNumber(item.scaleWeight)"></td>
-                          <td class="p-2.5 text-right font-bold text-emerald-400" x-text="formatNumber(item.netWeight)"></td>
-                          <td class="p-2.5 text-right font-bold text-amber-400" x-text="formatNumber(item.disposalCost)"></td>
+                          <td class="p-2.5 text-right text-slate-300 font-mono" x-text="formatNumber(item.scaleWeight)"></td>
+                          <td class="p-2.5 text-right font-bold text-emerald-400 font-mono" x-text="formatNumber(item.netWeight)"></td>
+                          <td class="p-2.5 text-right font-bold text-amber-400 font-mono" x-text="formatNumber(item.disposalCost)"></td>
                           <td class="p-2.5 text-center">
-                            <button @click="removeFromBasket(index)" class="text-rose-400 hover:text-rose-300 hover:bg-rose-950/60 p-1.5 rounded-lg transition" title="ลบรายการนี้"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                            <div class="flex items-center justify-center gap-1">
+                              <button type="button" @click="editBasketItem(index)" class="text-amber-400 hover:text-amber-300 hover:bg-amber-950/60 p-1.5 rounded-lg transition" title="แก้ไขรายการถังนี้"><i class="fa-solid fa-pen-to-square text-xs"></i></button>
+                              <button type="button" @click="removeFromBasket(index)" class="text-rose-400 hover:text-rose-300 hover:bg-rose-950/60 p-1.5 rounded-lg transition" title="ลบรายการนี้"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                            </div>
                           </td>
                         </tr>
                       </template>
@@ -7209,6 +7212,135 @@
         },
 
         removeFromBasket(index) { this.basket.splice(index, 1); },
+
+        async editBasketItem(index) {
+          if (index < 0 || index >= this.basket.length) return;
+          const item = this.basket[index];
+
+          // Build select options for refBins
+          const binOptionsHtml = this.refBins.map(b => {
+            const isSelected = String(b.id) === String(item.binId) || String(b.bin_number) === String(item.binName);
+            return `<option value="${b.id}" data-weight="${b.bin_weight}" ${isSelected ? 'selected' : ''}>${b.bin_number} (หัก ${this.formatNumber(b.bin_weight)} กก.)</option>`;
+          }).join('');
+
+          const { value: formValues } = await Swal.fire({
+            title: `แก้ไขรายการถัง (ลำดับที่ ${index + 1})`,
+            html: `
+              <div class="space-y-3 text-left text-xs text-slate-300">
+                <div>
+                  <label class="block font-semibold text-slate-200 mb-1">ข้อมูลถัง</label>
+                  <select id="swal-edit-bin" class="swal2-select !m-0 !w-full !text-xs !bg-slate-900 !border-slate-700 !text-slate-100 rounded-xl p-2.5">
+                    <option value="">-- เลือกถัง --</option>
+                    ${binOptionsHtml}
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-semibold text-orange-300 mb-1">น้ำหนักที่ชั่งได้ (กก.)</label>
+                  <input id="swal-edit-scale" type="number" step="0.01" value="${item.scaleWeight}" class="swal2-input !m-0 !w-full !text-sm !font-bold !bg-slate-900 !border-orange-500/50 !text-white rounded-xl p-2.5 text-right font-mono" placeholder="0.00">
+                </div>
+                <div class="grid grid-cols-3 gap-2 bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 text-center shadow-sm">
+                  <div class="p-1">
+                    <span class="text-[10px] text-slate-400 block mb-0.5">หักถัง</span>
+                    <strong id="swal-preview-bin-wt" class="text-slate-300 font-mono">${this.formatNumber(item.binWeight)}</strong> <span class="text-[10px] text-slate-400">กก.</span>
+                  </div>
+                  <div class="p-1">
+                    <span class="text-[10px] text-slate-400 block mb-0.5">สุทธิ</span>
+                    <strong id="swal-preview-net-wt" class="text-emerald-400 font-bold font-mono">${this.formatNumber(item.netWeight)}</strong> <span class="text-[10px] text-slate-400">กก.</span>
+                  </div>
+                  <div class="p-1">
+                    <span class="text-[10px] text-slate-400 block mb-0.5">มูลค่ากำจัด</span>
+                    <strong id="swal-preview-cost" class="text-amber-400 font-bold font-mono">${this.formatNumber(item.disposalCost)}</strong> <span class="text-[10px] text-slate-400">บ.</span>
+                  </div>
+                </div>
+              </div>
+            `,
+            didOpen: () => {
+              const binSelect = document.getElementById('swal-edit-bin');
+              const scaleInput = document.getElementById('swal-edit-scale');
+              const previewBinWt = document.getElementById('swal-preview-bin-wt');
+              const previewNetWt = document.getElementById('swal-preview-net-wt');
+              const previewCost = document.getElementById('swal-preview-cost');
+
+              const updatePreviews = () => {
+                const selectedOpt = binSelect ? binSelect.options[binSelect.selectedIndex] : null;
+                let bw = 0;
+                if (selectedOpt && selectedOpt.value) {
+                  const bId = selectedOpt.value;
+                  const found = this.refBins.find(b => String(b.id) === String(bId) || String(b.bin_number) === String(bId));
+                  bw = found ? Number(found.bin_weight || 0) : Number(selectedOpt.dataset.weight || 0);
+                }
+                const sc = Number(scaleInput ? scaleInput.value : 0);
+                const nw = Math.max(0, sc - bw);
+                const cost = nw * 9.75;
+
+                if (previewBinWt) previewBinWt.innerText = this.formatNumber(bw);
+                if (previewNetWt) previewNetWt.innerText = this.formatNumber(nw);
+                if (previewCost) previewCost.innerText = this.formatNumber(cost);
+              };
+
+              if (binSelect) binSelect.addEventListener('change', updatePreviews);
+              if (scaleInput) {
+                scaleInput.addEventListener('input', updatePreviews);
+                scaleInput.focus();
+                scaleInput.select();
+              }
+            },
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: '<i class="fa-solid fa-check mr-1"></i> บันทึกการแก้ไข',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#64748b',
+            customClass: {
+              popup: 'bg-[#0f172a] text-slate-200 border border-slate-800 rounded-3xl shadow-2xl p-4 sm:p-6'
+            },
+            preConfirm: () => {
+              const binSelect = document.getElementById('swal-edit-bin');
+              const scaleInput = document.getElementById('swal-edit-scale');
+              const bId = binSelect ? binSelect.value : '';
+              const sc = scaleInput ? Number(scaleInput.value) : 0;
+
+              if (!bId) {
+                Swal.showValidationMessage('กรุณาเลือกถัง');
+                return false;
+              }
+              if (isNaN(sc) || sc <= 0) {
+                Swal.showValidationMessage('น้ำหนักชั่งต้องมากกว่าศูนย์');
+                return false;
+              }
+
+              const found = this.refBins.find(b => String(b.id) === String(bId) || String(b.bin_number) === String(bId));
+              const bw = found ? Number(found.bin_weight || 0) : 0;
+              const binName = found ? found.bin_number : bId;
+              const nw = Math.max(0, sc - bw);
+              const cost = nw * 9.75;
+
+              return {
+                binId: String(bId),
+                binName: binName,
+                scaleWeight: Number(sc.toFixed(2)),
+                binWeight: Number(bw.toFixed(2)),
+                netWeight: Number(nw.toFixed(2)),
+                disposalCost: Number(cost.toFixed(2))
+              };
+            }
+          });
+
+          if (formValues) {
+            this.basket[index] = {
+              ...this.basket[index],
+              ...formValues
+            };
+            Swal.fire({
+              title: 'แก้ไขสำเร็จ',
+              text: `ปรับปรุงข้อมูล "${formValues.binName}" เรียบร้อยแล้ว`,
+              icon: 'success',
+              timer: 900,
+              showConfirmButton: false
+            });
+          }
+        },
+
         getBasketTotalNet() { return Number(this.basket.reduce((sum, b) => sum + b.netWeight, 0).toFixed(2)); },
         getBasketTotalCost() { return Number(this.basket.reduce((sum, b) => sum + b.disposalCost, 0).toFixed(2)); },
         clearBasket() { this.basket = []; },
@@ -7499,27 +7631,29 @@
           let itemsHtml = '';
           if (details.length > 0) {
             itemsHtml = `
-              <div class="overflow-x-auto my-3 border border-slate-700 rounded-xl">
-                <table class="w-full text-[11px] text-left text-slate-200">
-                  <thead class="bg-slate-800 text-slate-400 font-bold border-b border-slate-700">
+              <div class="table-container max-h-[min(50vh,400px)] overflow-y-auto overflow-x-auto my-2 border border-slate-700/80 rounded-xl bg-slate-950/60 shadow-inner">
+                <table class="w-full text-xs text-left text-slate-200">
+                  <thead class="sticky top-0 bg-[#1e293b] text-slate-300 font-bold border-b border-slate-700 z-10 shadow-sm">
                     <tr>
-                      <th class="p-2">รหัส</th>
-                      <th class="p-2">ข้อมูลถัง</th>
-                      <th class="p-2 text-right">น้ำหนักที่ชั่งได้</th>
-                      <th class="p-2 text-right">หักน้ำหนักถัง</th>
-                      <th class="p-2 text-right text-rose-300">น้ำหนักมูลฝอยรวม</th>
-                      <th class="p-2 text-right text-emerald-300">คิดเป็นมูลค่าการกำจัด</th>
+                      <th class="p-2.5 whitespace-nowrap">ลำดับ</th>
+                      <th class="p-2.5 whitespace-nowrap">รหัสรายการ</th>
+                      <th class="p-2.5 whitespace-nowrap">ข้อมูลถัง</th>
+                      <th class="p-2.5 text-right whitespace-nowrap">น้ำหนักที่ชั่งได้ (กก.)</th>
+                      <th class="p-2.5 text-right whitespace-nowrap">หักน้ำหนักถัง (กก.)</th>
+                      <th class="p-2.5 text-right text-rose-300 whitespace-nowrap">น้ำหนักสุทธิ (กก.)</th>
+                      <th class="p-2.5 text-right text-emerald-300 whitespace-nowrap">มูลค่ากำจัด (บาท)</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-800">
-                    ${details.map(d => `
-                      <tr>
-                        <td class="p-2 font-mono text-[10px] text-slate-400">${d.id || '-'}</td>
-                        <td class="p-2 font-semibold text-slate-200">${d.bin_name || this.getBinName(d.bin_id) || '-'}</td>
-                        <td class="p-2 text-right">${this.formatNumber(d.scale_weight)}</td>
-                        <td class="p-2 text-right text-slate-400">${this.formatNumber(d.bin_weight)}</td>
-                        <td class="p-2 text-right font-bold text-rose-400">${this.formatNumber(d.net_weight !== undefined ? d.net_weight : (Number(d.scale_weight) - Number(d.bin_weight)))}</td>
-                        <td class="p-2 text-right font-bold text-emerald-400">${this.formatNumber(d.disposal_cost !== undefined ? d.disposal_cost : ((Number(d.scale_weight) - Number(d.bin_weight)) * 9.75))}</td>
+                  <tbody class="divide-y divide-slate-800/80">
+                    ${details.map((d, idx) => `
+                      <tr class="hover:bg-slate-800/60 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-slate-900/30' : 'bg-slate-950/30'}">
+                        <td class="p-2.5 text-center font-mono text-[11px] text-slate-500">${idx + 1}</td>
+                        <td class="p-2.5 font-mono text-[11px] text-slate-400 whitespace-nowrap">${d.id || '-'}</td>
+                        <td class="p-2.5 font-semibold text-slate-100 whitespace-nowrap">${d.bin_name || this.getBinName(d.bin_id) || '-'}</td>
+                        <td class="p-2.5 text-right font-mono text-slate-200 whitespace-nowrap">${this.formatNumber(d.scale_weight)}</td>
+                        <td class="p-2.5 text-right font-mono text-slate-400 whitespace-nowrap">${this.formatNumber(d.bin_weight)}</td>
+                        <td class="p-2.5 text-right font-mono font-bold text-rose-400 whitespace-nowrap">${this.formatNumber(d.net_weight !== undefined ? d.net_weight : (Number(d.scale_weight) - Number(d.bin_weight)))}</td>
+                        <td class="p-2.5 text-right font-mono font-bold text-emerald-400 whitespace-nowrap">${this.formatNumber(d.disposal_cost !== undefined ? d.disposal_cost : ((Number(d.scale_weight) - Number(d.bin_weight)) * 9.75))}</td>
                       </tr>
                     `).join('')}
                   </tbody>
@@ -7527,16 +7661,17 @@
               </div>
             `;
           } else {
-            itemsHtml = '<p class="text-xs text-slate-400 my-2 italic">ยังไม่มีรายการชั่งรายถังแยกย่อยสำหรับบิลนี้</p>';
+            itemsHtml = '<div class="p-4 text-center text-xs text-slate-400 my-2 italic bg-slate-950/40 rounded-xl border border-slate-800">ยังไม่มีรายการชั่งรายถังแยกย่อยสำหรับบิลนี้</div>';
           }
 
           let photosHtml = '';
           if (history && (history.photo_url_1 || history.photo_url_2 || history.weighing_link)) {
             photosHtml = `
-              <div class="flex items-center gap-2 mt-3 pt-2 border-t border-slate-800 text-xs">
-                ${history.photo_url_1 ? `<a href="${history.photo_url_1}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 rounded-lg"><i class="fa-solid fa-image mr-1"></i>รูปภาพ 1</a>` : ''}
-                ${history.photo_url_2 ? `<a href="${history.photo_url_2}" target="_blank" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 rounded-lg"><i class="fa-solid fa-image mr-1"></i>รูปภาพ 2</a>` : ''}
-                ${history.weighing_link ? `<a href="${history.weighing_link}" target="_blank" class="px-2.5 py-1 bg-blue-950 text-blue-300 hover:bg-blue-900 rounded-lg"><i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>ตช.รพ.</a>` : ''}
+              <div class="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t border-slate-800 text-xs">
+                <span class="text-slate-400 font-medium mr-1"><i class="fa-solid fa-paperclip mr-1"></i>เอกสารแนบ:</span>
+                ${history.photo_url_1 ? `<a href="${history.photo_url_1}" target="_blank" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 rounded-lg border border-slate-700 transition flex items-center gap-1.5"><i class="fa-solid fa-image"></i>รูปภาพ 1</a>` : ''}
+                ${history.photo_url_2 ? `<a href="${history.photo_url_2}" target="_blank" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-sky-300 rounded-lg border border-slate-700 transition flex items-center gap-1.5"><i class="fa-solid fa-image"></i>รูปภาพ 2</a>` : ''}
+                ${history.weighing_link ? `<a href="${history.weighing_link}" target="_blank" class="px-3 py-1 bg-blue-950 text-blue-300 hover:bg-blue-900 rounded-lg border border-blue-800 transition flex items-center gap-1.5"><i class="fa-solid fa-arrow-up-right-from-square"></i>ตช.รพ.</a>` : ''}
               </div>
             `;
           }
@@ -7553,35 +7688,37 @@
           Swal.fire({
             title: `บิลส่งกำจัด: ${disposalNo}`,
             html: `
-              <div class="text-left text-xs text-slate-300 space-y-2">
-                <div class="grid grid-cols-2 gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                  <div><strong>วันที่:</strong> ${this.formatDate(recDate, disposalNo)}</div>
-                  <div><strong>บริษัทที่มารับ:</strong> ${compName}</div>
-                  <div><strong>ผู้ส่งมอบ:</strong> ${sender}</div>
-                  <div><strong>ผู้บันทึก:</strong> ${recorder}</div>
+              <div class="text-left text-xs text-slate-300 space-y-2.5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-950/80 p-3 rounded-2xl border border-slate-800 shadow-sm">
+                  <div><span class="text-slate-400">วันที่:</span> <strong class="text-slate-100">${this.formatDate(recDate, disposalNo)}</strong></div>
+                  <div><span class="text-slate-400">บริษัทที่มารับ:</span> <strong class="text-sky-300">${compName}</strong></div>
+                  <div><span class="text-slate-400">ผู้ส่งมอบ:</span> <strong class="text-slate-100">${sender}</strong></div>
+                  <div><span class="text-slate-400">ผู้บันทึก:</span> <strong class="text-slate-100">${recorder}</strong></div>
                 </div>
-                <div class="pt-1 font-bold text-slate-200 flex justify-between items-center">
-                  <span>รายการชั่งรายถัง (${details.length} ถัง):</span>
-                  <span class="text-emerald-400 font-extrabold text-sm">สุทธิรวม: ${this.formatNumber(totNet)} กก.</span>
+                <div class="pt-1 font-bold text-slate-200 flex flex-wrap justify-between items-center gap-2">
+                  <span class="flex items-center gap-1.5"><i class="fa-solid fa-boxes-stacked text-sky-400"></i> รายการชั่งรายถัง (${details.length} ถัง):</span>
+                  <span class="text-emerald-400 font-extrabold text-sm bg-emerald-950/60 px-3 py-1 rounded-xl border border-emerald-800/60 shadow-sm">สุทธิรวม: ${this.formatNumber(totNet)} กก.</span>
                 </div>
                 ${itemsHtml}
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-900/90 p-2 rounded-xl border border-slate-800 text-center">
-                  <div><span class="text-[10px] text-slate-400 block">ชั่งได้รวม</span><strong class="text-slate-200">${this.formatNumber(totScale)}</strong> กก.</div>
-                  <div><span class="text-[10px] text-slate-400 block">หักถังรวม</span><strong class="text-slate-400">${this.formatNumber(totBin)}</strong> กก.</div>
-                  <div><span class="text-[10px] text-slate-400 block">สุทธิรวม</span><strong class="text-rose-400">${this.formatNumber(totNet)}</strong> กก.</div>
-                  <div><span class="text-[10px] text-slate-400 block">มูลค่ากำจัด</span><strong class="text-emerald-400">${this.formatNumber(totCost)}</strong> บ.</div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-900/90 p-2.5 rounded-2xl border border-slate-800 text-center shadow-sm">
+                  <div class="p-1"><span class="text-[10px] text-slate-400 block mb-0.5">ชั่งได้รวม</span><strong class="text-slate-200 text-sm font-mono">${this.formatNumber(totScale)}</strong> <span class="text-[10px] text-slate-400">กก.</span></div>
+                  <div class="p-1"><span class="text-[10px] text-slate-400 block mb-0.5">หักถังรวม</span><strong class="text-slate-400 text-sm font-mono">${this.formatNumber(totBin)}</strong> <span class="text-[10px] text-slate-400">กก.</span></div>
+                  <div class="p-1"><span class="text-[10px] text-slate-400 block mb-0.5">สุทธิรวม</span><strong class="text-rose-400 text-sm font-mono">${this.formatNumber(totNet)}</strong> <span class="text-[10px] text-slate-400">กก.</span></div>
+                  <div class="p-1"><span class="text-[10px] text-slate-400 block mb-0.5">มูลค่ากำจัด</span><strong class="text-emerald-400 text-sm font-mono">${this.formatNumber(totCost)}</strong> <span class="text-[10px] text-slate-400">บ.</span></div>
                 </div>
                 ${photosHtml}
               </div>
             `,
-            width: '680px',
+            width: 'min(880px, 96vw)',
             showCloseButton: true,
-            showDenyButton: true,
+            showDenyButton: this.isAdmin(),
             denyButtonText: '<i class="fa-solid fa-pen-to-square mr-1"></i> แก้ไขข้อมูลบิลนี้ (ดึงเข้าตะกร้า)',
             denyButtonColor: '#d97706',
             confirmButtonText: 'ปิดหน้านี้',
+            confirmButtonColor: '#334155',
             customClass: {
-              popup: 'bg-[#0f172a] text-slate-200 border border-slate-800 rounded-3xl'
+              popup: 'bg-[#0f172a] text-slate-200 border border-slate-700/80 rounded-3xl max-h-[92vh] flex flex-col shadow-2xl p-4 sm:p-6',
+              htmlContainer: '!m-0 !mt-2 max-h-[calc(92vh-140px)] overflow-y-auto text-left pr-1 scrollbar-thin'
             }
           }).then((res) => {
             if (res.isDenied) {
