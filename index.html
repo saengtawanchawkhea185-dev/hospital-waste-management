@@ -50,6 +50,22 @@
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+  <!-- Pre-init theme to prevent flicker -->
+  <script>
+    (function() {
+      try {
+        const savedTheme = localStorage.getItem('hospital_waste_theme') || 'dark';
+        if (savedTheme === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light-theme');
+        } else {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light-theme');
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <style>
     body { font-family: 'Kanit', sans-serif; }
     [x-cloak] { display: none !important; }
@@ -106,7 +122,173 @@
       box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25) !important;
     }
 
-    @media print {
+    /* =========================================================
+       LIGHT THEME SYSTEM & ACCESSIBLE COLOR OVERRIDES
+       ========================================================= */
+    html.light-theme, body.light-theme {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+
+    /* Light Theme Scrollbars */
+    html.light-theme ::-webkit-scrollbar-track, body.light-theme ::-webkit-scrollbar-track {
+      background: #f1f5f9 !important;
+    }
+    html.light-theme ::-webkit-scrollbar-thumb, body.light-theme ::-webkit-scrollbar-thumb {
+      background: #cbd5e1 !important;
+      border-radius: 6px;
+    }
+    html.light-theme ::-webkit-scrollbar-thumb:hover, body.light-theme ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8 !important;
+    }
+
+    /* Light Theme Layout & Backgrounds */
+    .light-theme main,
+    .light-theme [class*="bg-[#090d16]"] {
+      background-color: #f8fafc !important;
+    }
+    .light-theme aside,
+    .light-theme header,
+    .light-theme [class*="bg-[#0d1322]"],
+    .light-theme [class*="bg-[#0a0f1b]"] {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    .light-theme [class*="bg-[#0f172a]"],
+    .light-theme [class*="bg-slate-900"] {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+    }
+    .light-theme [class*="bg-slate-950"],
+    .light-theme [class*="bg-[#0b101e]"],
+    .light-theme [class*="bg-[#020617]"] {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+    }
+
+    /* Light Theme Borders */
+    .light-theme [class*="border-slate-800"],
+    .light-theme [class*="border-slate-700"] {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Light Theme Typography */
+    .light-theme [class*="text-slate-100"],
+    .light-theme [class*="text-slate-200"],
+    .light-theme .text-white:not(button.bg-emerald-600):not(.bg-blue-600):not(.bg-indigo-600):not(.bg-rose-600):not(.bg-sky-600):not(.bg-emerald-500) {
+      color: #0f172a !important;
+    }
+    .light-theme [class*="text-slate-300"],
+    .light-theme [class*="text-slate-400"] {
+      color: #475569 !important;
+    }
+    .light-theme [class*="text-slate-500"] {
+      color: #64748b !important;
+    }
+
+    /* Stat Cards in Light Mode */
+    .light-theme [class*="bg-emerald-950"] {
+      background-color: #ecfdf5 !important;
+      border-color: #a7f3d0 !important;
+    }
+    .light-theme [class*="bg-sky-950"] {
+      background-color: #f0f9ff !important;
+      border-color: #bae6fd !important;
+    }
+    .light-theme [class*="bg-amber-950"] {
+      background-color: #fffbeb !important;
+      border-color: #fde68a !important;
+    }
+    .light-theme [class*="bg-rose-950"] {
+      background-color: #fff1f2 !important;
+      border-color: #fecdd3 !important;
+    }
+    .light-theme [class*="bg-purple-950"] {
+      background-color: #faf5ff !important;
+      border-color: #e9d5ff !important;
+    }
+
+    /* Light Theme Form Controls */
+    .light-theme input:not([type="checkbox"]):not([type="radio"]),
+    .light-theme select,
+    .light-theme textarea {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    .light-theme input::placeholder,
+    .light-theme textarea::placeholder {
+      color: #94a3b8 !important;
+    }
+    .light-theme select option {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+    }
+
+    /* Light Theme Tables */
+    .light-theme .sticky-header th {
+      background-color: #f1f5f9 !important;
+      color: #1e293b !important;
+      box-shadow: 0 1px 0 #cbd5e1 !important;
+    }
+    .light-theme table {
+      color: #1e293b !important;
+    }
+    .light-theme table tbody tr {
+      border-bottom-color: #f1f5f9 !important;
+    }
+    .light-theme table tbody tr:hover {
+      background-color: #f8fafc !important;
+    }
+    .light-theme .table-container {
+      scrollbar-color: #cbd5e1 #f1f5f9 !important;
+    }
+    .light-theme .table-container::-webkit-scrollbar-track {
+      background: #f1f5f9 !important;
+    }
+    .light-theme .table-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1 !important;
+      border: 2px solid #f1f5f9 !important;
+    }
+
+    /* Light Theme Modals & Dialogs */
+    .light-theme .fixed.inset-0[class*="bg-slate-950"],
+    .light-theme .fixed.inset-0[class*="bg-black"],
+    .light-theme .fixed.inset-0[class*="bg-[#070a12]"] {
+      background-color: rgba(15, 23, 42, 0.6) !important;
+    }
+    .light-theme .fixed [class*="bg-slate-900"] {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Light Theme SweetAlert2 */
+    .light-theme .swal2-popup {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15) !important;
+    }
+    .light-theme .swal2-title { color: #0f172a !important; }
+    .light-theme .swal2-html-container { color: #475569 !important; }
+    .light-theme .swal2-input {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+
+    /* Light Theme Sidebar Navigation Items */
+    .light-theme aside nav button:not(.bg-emerald-600):not(.bg-emerald-600\/20) {
+      color: #475569 !important;
+    }
+    .light-theme aside nav button:not(.bg-emerald-600):not(.bg-emerald-600\/20):hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+ {
       body { background: white !important; color: black !important; }
       .no-print { display: none !important; }
       .print-layout { width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; }
@@ -356,7 +538,15 @@
         </nav>
 
         <!-- SIDEBAR FOOTER -->
-        <div class="p-3.5 border-t border-slate-800/80 space-y-2 bg-[#0a0f1b]">
+        <div class="p-3.5 border-t border-slate-800/80 space-y-2.5 bg-[#0a0f1b]">
+          <!-- SIDEBAR THEME TOGGLE BUTTON -->
+          <button type="button" @click="toggleTheme()" 
+                  :class="theme === 'dark' ? 'border-amber-500/50 bg-slate-900/90 text-amber-300 hover:bg-slate-800' : 'border-indigo-300 bg-white text-indigo-600 hover:bg-slate-50'"
+                  class="w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-xl text-xs font-semibold border transition shadow-sm cursor-pointer">
+            <i :class="theme === 'dark' ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-indigo-500'"></i>
+            <span x-text="theme === 'dark' ? 'เปลี่ยนเป็น ธีมสว่าง (Light)' : 'เปลี่ยนเป็น ธีมมืด (Dark)'"></span>
+          </button>
+
           <div class="text-[10px] text-slate-400 text-center font-light leading-tight">
             พัฒนาโดย <br>
             <span class="font-semibold text-emerald-400">นายแสงตะวัน ชาวเขา</span>
@@ -373,9 +563,9 @@
     <main class="flex-1 flex flex-col h-full overflow-hidden bg-[#090d16]">
       
       <!-- TOP HEADER -->
-      <header class="bg-[#0d1322] border-b border-slate-800 h-14 sm:h-16 flex-shrink-0 flex items-center justify-between px-3 sm:px-6 z-20 no-print shadow-sm">
+      <header class="bg-[#0d1322] border-b border-slate-800 h-14 sm:h-16 flex-shrink-0 flex items-center justify-between px-3 sm:px-6 z-20 no-print shadow-sm gap-2">
         
-        <div class="flex items-center space-x-2 sm:space-x-3 overflow-hidden">
+        <div class="flex items-center space-x-2 sm:space-x-3 overflow-hidden flex-shrink min-w-0">
           <!-- HAMBURGER BUTTON (MOBILE / TABLET) -->
           <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800/80 rounded-xl transition" title="เปิดเมนู">
             <i class="fa-solid fa-bars text-lg"></i>
@@ -386,16 +576,54 @@
             <i class="fa-solid fa-bars-staggered text-base"></i>
           </button>
 
-          <h1 class="text-xs sm:text-sm md:text-base font-bold text-slate-100 truncate" x-text="getTabTitle()"></h1>
+          <!-- BACK & NEXT NAVIGATION BUTTONS -->
+          <div class="flex items-center space-x-1 sm:space-x-1.5 flex-shrink-0">
+            <button type="button" @click="goBack()" 
+                    class="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-emerald-500/70 dark:border-emerald-500/60 dark:text-emerald-400 text-emerald-700 dark:bg-slate-900/90 bg-white hover:bg-emerald-50 dark:hover:bg-emerald-950/60 hover:border-emerald-400 active:scale-95 text-xs font-bold transition shadow-sm cursor-pointer" 
+                    title="ย้อนกลับ (Back)">
+              <i class="fa-solid fa-arrow-left text-[10px] sm:text-xs"></i>
+              <span class="inline">ย้อนกลับ</span>
+            </button>
+            <button type="button" @click="goForward()" 
+                    class="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-emerald-500/70 dark:border-emerald-500/60 dark:text-emerald-400 text-emerald-700 dark:bg-slate-900/90 bg-white hover:bg-emerald-50 dark:hover:bg-emerald-950/60 hover:border-emerald-400 active:scale-95 text-xs font-bold transition shadow-sm cursor-pointer" 
+                    title="ถัดไป (Forward)">
+              <span class="inline">ถัดไป</span>
+              <i class="fa-solid fa-arrow-right text-[10px] sm:text-xs"></i>
+            </button>
+          </div>
+
+          <h1 class="text-xs sm:text-sm md:text-base font-bold text-slate-100 truncate pl-1" x-text="getTabTitle()"></h1>
         </div>
 
         <!-- HEADER RIGHT ACTIONS -->
         <div class="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+          
+          <!-- THEME TOGGLE BUTTON -->
+          <button type="button" @click="toggleTheme()" 
+                  :class="theme === 'dark' ? 'border-amber-500/60 bg-slate-900/90 text-amber-300 hover:bg-slate-800 hover:border-amber-400 shadow-sm' : 'border-indigo-300 bg-white text-indigo-600 hover:bg-slate-50 hover:border-indigo-400 shadow-sm'"
+                  class="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full border text-xs font-semibold transition cursor-pointer" 
+                  :title="theme === 'dark' ? 'เปลี่ยนเป็นธีมสว่าง (Light Mode)' : 'เปลี่ยนเป็นธีมมืด (Dark Mode)'">
+            <template x-if="theme === 'dark'">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-sun text-amber-400 text-xs sm:text-sm"></i>
+                <span class="inline">ธีมสว่าง</span>
+              </span>
+            </template>
+            <template x-if="theme === 'light'">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-moon text-indigo-500 text-xs sm:text-sm"></i>
+                <span class="inline">ธีมมืด</span>
+              </span>
+            </template>
+          </button>
+
+          <!-- DATABASE CONNECTION PILL -->
           <div class="flex items-center space-x-1.5 cursor-pointer bg-slate-900/90 border border-slate-800 hover:border-slate-700 px-2.5 py-1.5 rounded-full transition" @click="showDbConfigModal = true">
             <span class="w-2 h-2 rounded-full flex-shrink-0" :class="isDbConnected ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse' : 'bg-amber-400'"></span>
             <span class="text-[10px] sm:text-xs font-medium" :class="isDbConnected ? 'text-emerald-400' : 'text-amber-400'" x-text="isDbConnected ? 'Supabase Online' : 'Sandbox (Offline)'"></span>
           </div>
 
+          <!-- SETTINGS BUTTON -->
           <button @click="showDbConfigModal = true" class="p-2 bg-slate-900/90 border border-slate-800 hover:bg-slate-800 hover:text-white rounded-xl transition text-slate-400" title="ตั้งค่าฐานข้อมูล">
             <i class="fa-solid fa-gear text-sm" :class="!isDbConnected ? 'text-amber-400 animate-bounce' : 'animate-spin'" style="animation-duration: 10s;"></i>
           </button>
@@ -428,9 +656,13 @@
               <div>
                 <span class="text-xs font-bold text-slate-200">ค้นหา & ปฏิบัติการข้อมูล</span>
                 <span class="text-[10px] text-slate-400 block sm:inline sm:ml-2" x-text="`หน้าต่าง: ${getTabTitle()}`"></span>
+                <span x-show="isLoadingTable[getCurrentTargetTable()]" class="inline-flex items-center gap-1 text-[10px] text-amber-400 font-medium sm:ml-2 animate-pulse" x-cloak>
+                  <i class="fa-solid fa-spinner animate-spin text-[9px]"></i>
+                  <span>กำลังโหลดข้อมูลเพิ่มเติม...</span>
+                </span>
                 <div class="flex items-center gap-1.5 mt-1 flex-wrap">
                   <button type="button" @click="resetAllFilters()"
-                    :class="(!filters.startDate && !filters.endDate && !filters.year && !filters.month && !filters.keyword && !filters.departmentId) ? 'bg-emerald-600 text-white font-bold shadow' : 'bg-slate-900 text-slate-400 hover:text-white'"
+                    :class="(!filters.startDate && !filters.endDate && !filters.year && !filters.month && !filters.keyword && !filters.departmentId && (!filters.reportType || filters.reportType === 'all')) ? 'bg-emerald-600 text-white font-bold shadow' : 'bg-slate-900 text-slate-400 hover:text-white'"
                     class="px-2.5 py-0.5 rounded-full text-[10px] border border-slate-700 transition flex items-center gap-1">
                     <i class="fa-solid fa-thumbtack text-[9px]"></i>
                     <span>แสดงข้อมูลทั้งหมด (All Data)</span>
@@ -548,13 +780,13 @@
             <!-- 4. วันที่เริ่มต้น / วันที่ -->
             <div>
               <label class="block text-[11px] font-medium text-slate-300 mb-1.5">วันที่เริ่มต้น</label>
-              <input type="date" x-model="filters.startDate" @change="applyFilters()" class="w-full text-xs bg-[#0b101e] border border-slate-700/80 rounded-xl px-2.5 py-2 text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition">
+              <input type="date" x-model="filters.startDate" @change="onDateFilterChange()" class="w-full text-xs bg-[#0b101e] border border-slate-700/80 rounded-xl px-2.5 py-2 text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition">
             </div>
 
             <!-- 5. วันที่สิ้นสุด -->
             <div>
               <label class="block text-[11px] font-medium text-slate-300 mb-1.5">วันที่สิ้นสุด</label>
-              <input type="date" x-model="filters.endDate" @change="applyFilters()" class="w-full text-xs bg-[#0b101e] border border-slate-700/80 rounded-xl px-2.5 py-2 text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition">
+              <input type="date" x-model="filters.endDate" @change="onDateFilterChange()" class="w-full text-xs bg-[#0b101e] border border-slate-700/80 rounded-xl px-2.5 py-2 text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition">
             </div>
 
             <!-- 6. ปี พ.ศ. -->
@@ -565,10 +797,10 @@
                   <i class="fa-solid fa-plus-circle text-[9px]"></i> <span>เพิ่มปี</span>
                 </button>
               </div>
-              <select x-model="filters.year" @change="applyFilters()" class="w-full text-xs bg-[#0b101e] border border-slate-700/80 rounded-xl px-2.5 py-2 text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition">
+              <select x-model="filters.year" @change="onYearOrMonthFilterChange()" class="w-full text-xs bg-[#0b101e] border border-slate-700/80 rounded-xl px-2.5 py-2 text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition">
                 <option value="">ทุกปี</option>
                 <template x-for="y in years">
-                  <option :value="y" x-text="y == getCurrentBEYear() ? `${y} (ปัจจุบัน)` : y"></option>
+                  <option :value="y" x-text="y"></option>
                 </template>
               </select>
             </div>
@@ -576,7 +808,7 @@
             <!-- 7. เดือน -->
             <div>
               <label class="block text-[11px] font-medium text-slate-300 mb-1.5">เดือน</label>
-              <select x-model="filters.month" @change="applyFilters()" class="w-full text-xs bg-[#0b101e] border border-slate-700/80 rounded-xl px-2.5 py-2 text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition">
+              <select x-model="filters.month" @change="onYearOrMonthFilterChange()" class="w-full text-xs bg-[#0b101e] border border-slate-700/80 rounded-xl px-2.5 py-2 text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition">
                 <option value="">ทุกเดือน</option>
                 <template x-for="m in months">
                   <option :value="m" x-text="m"></option>
@@ -592,27 +824,27 @@
              class="space-y-4 sm:space-y-6" x-cloak>
           
           <!-- MOPH ACCREDITATION & PRESET BANNER -->
-          <div class="bg-gradient-to-r from-slate-900 via-[#0e1726] to-slate-900 p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="green-clean-banner bg-white border-slate-200 text-slate-800 dark:bg-gradient-to-r dark:from-slate-900 dark:via-[#0e1726] dark:to-slate-900 p-4 sm:p-5 rounded-2xl border dark:border-slate-800 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center space-x-3">
-              <div class="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400">
+              <div class="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-500 dark:text-emerald-400">
                 <i class="fa-solid fa-award text-xl"></i>
               </div>
               <div>
-                <h2 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                <h2 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <span>มาตรฐาน GREEN & CLEAN Hospital</span>
-                  <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded-full font-medium">กรมอนามัย กระทรวงสาธารณสุข</span>
+                  <span class="text-[10px] bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 border dark:border-emerald-800 px-2 py-0.5 rounded-full font-medium">กรมอนามัย กระทรวงสาธารณสุข</span>
                 </h2>
-                <p class="text-[10px] sm:text-xs text-slate-400">การบริหารจัดการมูลฝอยทางการแพทย์ ลดก๊าซเรือนกระจก และการชดเชยคาร์บอนเครดิต (TGO Standard)</p>
+                <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">การบริหารจัดการมูลฝอยทางการแพทย์ ลดก๊าซเรือนกระจก และการชดเชยคาร์บอนเครดิต (TGO Standard)</p>
               </div>
             </div>
 
             <!-- QUICK PRESET BUTTONS -->
             <div class="flex items-center flex-wrap gap-1.5">
-              <span class="text-[10px] text-slate-400 mr-1 hidden sm:inline">ลัดช่วงเวลา:</span>
-              <button @click="setFilterPreset('this_month')" class="text-[10px] sm:text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition">เดือนนี้</button>
-              <button @click="setFilterPreset('current_year')" class="text-[10px] sm:text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition" x-text="`ปี ${getCurrentBEYear()}`"></button>
-              <button @click="setFilterPreset('prev_year')" class="text-[10px] sm:text-xs px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition" x-text="`ปี ${parseInt(getCurrentBEYear()) - 1}`"></button>
-              <button @click="setFilterPreset('all')" class="text-[10px] sm:text-xs px-2.5 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-800/60 text-emerald-300 hover:bg-emerald-900 transition">ทั้งหมด</button>
+              <span class="text-[10px] text-slate-500 dark:text-slate-400 mr-1 hidden sm:inline">ลัดช่วงเวลา:</span>
+              <button @click="setFilterPreset('this_month')" class="text-[10px] sm:text-xs px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white transition">เดือนนี้</button>
+              <button @click="setFilterPreset('current_year')" class="text-[10px] sm:text-xs px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white transition" x-text="`ปี ${getCurrentBEYear()}`"></button>
+              <button @click="setFilterPreset('prev_year')" class="text-[10px] sm:text-xs px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:hover:text-white transition" x-text="`ปี ${parseInt(getCurrentBEYear()) - 1}`"></button>
+              <button @click="setFilterPreset('all')" class="text-[10px] sm:text-xs px-2.5 py-1.5 rounded-lg bg-emerald-600 text-white dark:bg-emerald-950/80 border border-emerald-500 dark:border-emerald-800/60 dark:text-emerald-300 hover:bg-emerald-700 dark:hover:bg-emerald-900 transition">ทั้งหมด</button>
             </div>
           </div>
 
@@ -620,93 +852,93 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             
             <!-- 1. ปริมาณมูลฝอยรวมทุกประเภท -->
-            <div class="bg-gradient-to-br from-slate-900 to-[#101827] p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-md relative overflow-hidden">
-              <div class="absolute -right-2 -bottom-2 text-slate-800/40 text-6xl pointer-events-none">
+            <div class="hero-metric-card metric-waste bg-white border-slate-200 dark:bg-gradient-to-br dark:from-slate-900 dark:to-[#101827] p-4 sm:p-5 rounded-2xl border dark:border-slate-800 shadow-md relative overflow-hidden">
+              <div class="absolute -right-2 -bottom-2 text-slate-200 dark:text-slate-800/40 text-6xl pointer-events-none">
                 <i class="fa-solid fa-recycle"></i>
               </div>
               <div class="flex items-center justify-between mb-1.5">
-                <span class="text-[11px] sm:text-xs font-semibold text-slate-400">ปริมาณมูลฝอยรวมทั้งหมด</span>
-                <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">สธ. KPI 1</span>
+                <span class="text-[11px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400">ปริมาณมูลฝอยรวมทั้งหมด</span>
+                <span class="text-[10px] bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">สธ. KPI 1</span>
               </div>
               <div class="flex items-baseline space-x-2">
-                <h3 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight" x-text="formatNumber(stats.totalWasteAll)">0.00</h3>
-                <span class="text-xs text-slate-400 font-medium">กก.</span>
+                <h3 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight" x-text="formatNumber(stats.totalWasteAll)">0.00</h3>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">กก.</span>
               </div>
-              <div class="mt-3 flex items-center text-[10px] text-emerald-400 font-medium">
+              <div class="mt-3 flex items-center text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
                 <i class="fa-solid fa-arrow-trend-down mr-1"></i>
                 <span>อัตราการนำกลับมาใช้: <strong x-text="`${stats.diversionRate.toFixed(1)}%`">0.0%</strong></span>
               </div>
             </div>
 
             <!-- 2. คาร์บอนเครดิต / ลดก๊าซเรือนกระจก -->
-            <div class="bg-gradient-to-br from-emerald-950/80 via-slate-900 to-[#0c1f17] p-4 sm:p-5 rounded-2xl border border-emerald-800/50 shadow-md relative overflow-hidden">
-              <div class="absolute -right-2 -bottom-2 text-emerald-900/30 text-6xl pointer-events-none">
+            <div class="hero-metric-card metric-carbon bg-emerald-50/90 border-emerald-200 dark:bg-gradient-to-br dark:from-emerald-950/80 dark:via-slate-900 dark:to-[#0c1f17] p-4 sm:p-5 rounded-2xl border dark:border-emerald-800/50 shadow-md relative overflow-hidden">
+              <div class="absolute -right-2 -bottom-2 text-emerald-200/50 dark:text-emerald-900/30 text-6xl pointer-events-none">
                 <i class="fa-solid fa-leaf"></i>
               </div>
               <div class="flex items-center justify-between mb-1.5">
-                <span class="text-[11px] sm:text-xs font-semibold text-emerald-300">ลดก๊าซเรือนกระจก / คาร์บอน</span>
-                <span class="text-[10px] bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700/60">TGO Standard</span>
+                <span class="text-[11px] sm:text-xs font-semibold text-emerald-800 dark:text-emerald-300">ลดก๊าซเรือนกระจก / คาร์บอน</span>
+                <span class="text-[10px] bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/60 dark:text-emerald-300 px-2 py-0.5 rounded-full border dark:border-emerald-700/60 font-medium">TGO Standard</span>
               </div>
               <div class="flex items-baseline space-x-2">
-                <h3 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-emerald-400 tracking-tight" x-text="stats.carbonCreditTon.toFixed(3)">0.000</h3>
-                <span class="text-xs text-emerald-300 font-medium">tCO₂e</span>
+                <h3 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight" x-text="stats.carbonCreditTon.toFixed(3)">0.000</h3>
+                <span class="text-xs text-emerald-800 dark:text-emerald-300 font-medium">tCO₂e</span>
               </div>
-              <div class="mt-3 flex items-center text-[10px] text-emerald-300">
-                <i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i>
+              <div class="mt-3 flex items-center text-[10px] text-emerald-800 dark:text-emerald-300">
+                <i class="fa-solid fa-circle-check mr-1 text-emerald-600 dark:text-emerald-400"></i>
                 <span>คิดเป็น <strong x-text="formatNumber(stats.ghgTotalKg)">0.00</strong> kgCO₂e สะสม</span>
               </div>
             </div>
 
             <!-- 3. มูลฝอยติดเชื้อรวม รพ. + 21 รพ.สต. -->
-            <div class="bg-gradient-to-br from-rose-950/70 via-slate-900 to-[#220c15] p-4 sm:p-5 rounded-2xl border border-rose-800/50 shadow-md relative overflow-hidden flex flex-col justify-between">
-              <div class="absolute -right-2 -bottom-2 text-rose-900/30 text-6xl pointer-events-none">
+            <div class="hero-metric-card metric-infectious bg-rose-50/90 border-rose-200 dark:bg-gradient-to-br dark:from-rose-950/70 dark:via-slate-900 dark:to-[#220c15] p-4 sm:p-5 rounded-2xl border dark:border-rose-800/50 shadow-md relative overflow-hidden flex flex-col justify-between">
+              <div class="absolute -right-2 -bottom-2 text-rose-200/50 dark:text-rose-900/30 text-6xl pointer-events-none">
                 <i class="fa-solid fa-biohazard"></i>
               </div>
               <div>
                 <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[11px] sm:text-xs font-semibold text-rose-300">มูลฝอยติดเชื้อรวมทั้งหมด</span>
-                  <span class="text-[10px] bg-rose-900/60 text-rose-300 px-2 py-0.5 rounded-full border border-rose-700/60 font-semibold">ส่งกำจัด</span>
+                  <span class="text-[11px] sm:text-xs font-semibold text-rose-800 dark:text-rose-300">มูลฝอยติดเชื้อรวมทั้งหมด</span>
+                  <span class="text-[10px] bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/60 dark:text-rose-300 px-2 py-0.5 rounded-full border dark:border-rose-700/60 font-semibold">ส่งกำจัด</span>
                 </div>
                 <div class="flex items-baseline space-x-2">
-                  <h3 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-rose-400 tracking-tight" x-text="formatNumber(stats.totalInfectiousAll)">0.00</h3>
-                  <span class="text-xs text-rose-300 font-medium">กก.</span>
+                  <h3 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-rose-600 dark:text-rose-400 tracking-tight" x-text="formatNumber(stats.totalInfectiousAll)">0.00</h3>
+                  <span class="text-xs text-rose-800 dark:text-rose-300 font-medium">กก.</span>
                 </div>
               </div>
-              <div class="mt-3 pt-2.5 border-t border-rose-900/40 grid grid-cols-2 gap-2 text-[10px]">
-                <div class="bg-slate-950/70 p-1.5 rounded-lg border border-rose-900/40">
-                  <span class="text-slate-400 block text-[9px]"><i class="fa-solid fa-hospital mr-1 text-rose-400"></i>รพ.หลัก (หักลบ รพ.สต.):</span>
-                  <strong class="text-rose-300 text-xs font-bold" x-text="`${formatNumber(stats.disposalHospitalPortion)} กก.`">0.00 กก.</strong>
+              <div class="mt-3 pt-2.5 border-t border-rose-200 dark:border-rose-900/40 grid grid-cols-2 gap-2 text-[10px]">
+                <div class="bg-white border-rose-200 dark:bg-slate-950/70 p-1.5 rounded-lg border dark:border-rose-900/40 shadow-sm">
+                  <span class="text-slate-600 dark:text-slate-400 block text-[9px]"><i class="fa-solid fa-hospital mr-1 text-rose-500 dark:text-rose-400"></i>รพ.หลัก (หักลบ รพ.สต.):</span>
+                  <strong class="text-rose-700 dark:text-rose-300 text-xs font-bold" x-text="`${formatNumber(stats.disposalHospitalPortion)} กก.`">0.00 กก.</strong>
                 </div>
-                <div class="bg-slate-950/70 p-1.5 rounded-lg border border-rose-900/40 text-right">
-                  <span class="text-slate-400 block text-[9px]"><i class="fa-solid fa-house-medical mr-1 text-rose-400"></i>รพ.สต. เครือข่าย:</span>
-                  <strong class="text-rose-300 text-xs font-bold" x-text="`${formatNumber(stats.subdistrictTotal)} กก.`">0.00 กก.</strong>
+                <div class="bg-white border-rose-200 dark:bg-slate-950/70 p-1.5 rounded-lg border dark:border-rose-900/40 text-right shadow-sm">
+                  <span class="text-slate-600 dark:text-slate-400 block text-[9px]"><i class="fa-solid fa-house-medical mr-1 text-rose-500 dark:text-rose-400"></i>รพ.สต. เครือข่าย:</span>
+                  <strong class="text-rose-700 dark:text-rose-300 text-xs font-bold" x-text="`${formatNumber(stats.subdistrictTotal)} กก.`">0.00 กก.</strong>
                 </div>
               </div>
             </div>
 
             <!-- 4. ค่าใช้จ่ายในการกำจัดรวม -->
-            <div class="bg-gradient-to-br from-sky-950/70 via-slate-900 to-[#0c1827] p-4 sm:p-5 rounded-2xl border border-sky-800/50 shadow-md relative overflow-hidden flex flex-col justify-between">
-              <div class="absolute -right-2 -bottom-2 text-sky-900/30 text-6xl pointer-events-none">
+            <div class="hero-metric-card metric-cost bg-sky-50/90 border-sky-200 dark:bg-gradient-to-br dark:from-sky-950/70 dark:via-slate-900 dark:to-[#0c1827] p-4 sm:p-5 rounded-2xl border dark:border-sky-800/50 shadow-md relative overflow-hidden flex flex-col justify-between">
+              <div class="absolute -right-2 -bottom-2 text-sky-200/50 dark:text-sky-900/30 text-6xl pointer-events-none">
                 <i class="fa-solid fa-receipt"></i>
               </div>
               <div>
                 <div class="flex items-center justify-between mb-1.5">
-                  <span class="text-[11px] sm:text-xs font-semibold text-sky-300">มูลค่าการกำจัดรวม</span>
-                  <span class="text-[10px] bg-sky-900/60 text-sky-300 px-2 py-0.5 rounded-full border border-sky-700/60">9.75 บ./กก.</span>
+                  <span class="text-[11px] sm:text-xs font-semibold text-sky-800 dark:text-sky-300">มูลค่าการกำจัดรวม</span>
+                  <span class="text-[10px] bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-900/60 dark:text-sky-300 px-2 py-0.5 rounded-full border dark:border-sky-700/60 font-semibold">9.75 บ./กก.</span>
                 </div>
                 <div class="flex items-baseline space-x-2">
-                  <h3 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-sky-400 tracking-tight" x-text="formatNumber(stats.disposalCostTotal)">0.00</h3>
-                  <span class="text-xs text-sky-300 font-medium">บาท</span>
+                  <h3 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-sky-600 dark:text-sky-400 tracking-tight" x-text="formatNumber(stats.disposalCostTotal)">0.00</h3>
+                  <span class="text-xs text-sky-800 dark:text-sky-300 font-medium">บาท</span>
                 </div>
               </div>
-              <div class="mt-3 pt-2.5 border-t border-sky-900/40 grid grid-cols-2 gap-2 text-[10px]">
-                <div class="bg-slate-950/70 p-1.5 rounded-lg border border-sky-900/40">
-                  <span class="text-slate-400 block text-[9px]"><i class="fa-solid fa-hospital mr-1 text-sky-400"></i>รพ.หลัก:</span>
-                  <strong class="text-sky-300 text-xs font-bold" x-text="`${formatNumber(stats.disposalHospitalCost)} บ.`">0.00 บ.</strong>
+              <div class="mt-3 pt-2.5 border-t border-sky-200 dark:border-sky-900/40 grid grid-cols-2 gap-2 text-[10px]">
+                <div class="bg-white border-sky-200 dark:bg-slate-950/70 p-1.5 rounded-lg border dark:border-sky-900/40 shadow-sm">
+                  <span class="text-slate-600 dark:text-slate-400 block text-[9px]"><i class="fa-solid fa-hospital mr-1 text-sky-500 dark:text-sky-400"></i>รพ.หลัก:</span>
+                  <strong class="text-sky-700 dark:text-sky-300 text-xs font-bold" x-text="`${formatNumber(stats.disposalHospitalCost)} บ.`">0.00 บ.</strong>
                 </div>
-                <div class="bg-slate-950/70 p-1.5 rounded-lg border border-sky-900/40 text-right">
-                  <span class="text-slate-400 block text-[9px]"><i class="fa-solid fa-house-medical mr-1 text-sky-400"></i>รพ.สต. เครือข่าย:</span>
-                  <strong class="text-sky-300 text-xs font-bold" x-text="`${formatNumber(stats.disposalSubdistrictCost)} บ.`">0.00 บ.</strong>
+                <div class="bg-white border-sky-200 dark:bg-slate-950/70 p-1.5 rounded-lg border dark:border-sky-900/40 text-right shadow-sm">
+                  <span class="text-slate-600 dark:text-slate-400 block text-[9px]"><i class="fa-solid fa-house-medical mr-1 text-sky-500 dark:text-sky-400"></i>รพ.สต. เครือข่าย:</span>
+                  <strong class="text-sky-700 dark:text-sky-300 text-xs font-bold" x-text="`${formatNumber(stats.disposalSubdistrictCost)} บ.`">0.00 บ.</strong>
                 </div>
               </div>
             </div>
@@ -1312,7 +1544,7 @@
                 </div>
                 <select x-model="genWasteForm.year" class="w-full text-xs bg-slate-950/80 border border-slate-700/80 rounded-xl px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                   <template x-for="y in years">
-                    <option :value="y" x-text="y == getCurrentBEYear() ? `${y} (ปัจจุบัน)` : y"></option>
+                    <option :value="y" x-text="y"></option>
                   </template>
                 </select>
               </div>
@@ -1371,19 +1603,19 @@
                 <h3 class="text-xs sm:text-sm font-bold text-slate-100">ตารางประวัติบันทึกข้อมูลขยะทั่วไป</h3>
                 <!-- Quick Shift Filter Tabs -->
                 <div class="inline-flex p-0.5 bg-slate-950 rounded-xl border border-slate-800 text-[11px]">
-                  <button type="button" @click="generalWasteShiftFilter = 'all'" 
+                  <button type="button" @click="setGeneralWasteShift('all')" 
                           :class="generalWasteShiftFilter === 'all' ? 'bg-slate-800 text-white font-bold shadow' : 'text-slate-400 hover:text-slate-200'" 
                           class="px-2.5 py-1 rounded-lg transition flex items-center gap-1">
                     <span>ทั้งหมด</span>
                     <span class="px-1.5 py-0.2 rounded-full text-[9px] bg-slate-900 text-slate-300 font-mono" x-text="(generalWasteRecords || []).length"></span>
                   </button>
-                  <button type="button" @click="generalWasteShiftFilter = 'morning'" 
+                  <button type="button" @click="setGeneralWasteShift('morning')" 
                           :class="generalWasteShiftFilter === 'morning' ? 'bg-amber-950 text-amber-300 border border-amber-800/80 font-bold shadow' : 'text-slate-400 hover:text-amber-300'" 
                           class="px-2.5 py-1 rounded-lg transition flex items-center gap-1">
                     <span>☀️ รอบเช้า (08-12 น.)</span>
                     <span class="px-1.5 py-0.2 rounded-full text-[9px] bg-amber-950 text-amber-300 font-mono" x-text="(generalWasteRecords || []).filter(r => getRecordShift(r) === 'morning').length"></span>
                   </button>
-                  <button type="button" @click="generalWasteShiftFilter = 'afternoon'" 
+                  <button type="button" @click="setGeneralWasteShift('afternoon')" 
                           :class="generalWasteShiftFilter === 'afternoon' ? 'bg-sky-950 text-sky-300 border border-sky-800/80 font-bold shadow' : 'text-slate-400 hover:text-sky-300'" 
                           class="px-2.5 py-1 rounded-lg transition flex items-center gap-1">
                     <span>🌤️ รอบบ่าย (13-16 น.)</span>
@@ -1436,59 +1668,158 @@
               </table>
             </div>
 
-            <!-- PAGINATION CONTROLS: GENERAL WASTE -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 mt-2 border-t border-slate-800/80 text-xs text-slate-400">
-              <div class="flex items-center gap-3 flex-wrap">
-                <span x-text="getPaginationRangeText(filteredGeneralWaste(), 'general_waste')" class="font-medium text-slate-300"></span>
-                <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800">
-                  <span class="text-[11px] text-slate-400">แสดงหน้าละ:</span>
-                  <select @change="setPageSize('general_waste', $event.target.value)" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
-                    <option value="10" :selected="pagination.general_waste?.pageSize === 10">10</option>
-                    <option value="25" :selected="pagination.general_waste?.pageSize === 25">25</option>
-                    <option value="50" :selected="pagination.general_waste?.pageSize === 50">50</option>
-                    <option value="100" :selected="pagination.general_waste?.pageSize === 100">100</option>
-                    <option value="200" :selected="pagination.general_waste?.pageSize === 200">200</option>
-                    <option value="all" :selected="pagination.general_waste?.pageSize >= 99999">ทั้งหมด</option>
-                  </select>
-                  <span class="text-[11px] text-slate-400">แถว</span>
+            <!-- TOTALS & SUMMARY SECTION (ผลรวมทุกๆ หน้า: บันทึกข้อมูลมูลฝอยทั่วไปและขยะอินทรีย์) -->
+            <div class="mt-4 pt-3 border-t border-slate-800/80 space-y-3">
+              
+              <!-- 1. TOP SUMMARY STRIP (แถบสรุปรวมด้านบน) -->
+              <div class="bg-slate-950/70 p-3 sm:px-4 sm:py-2.5 rounded-2xl border border-emerald-500/20 flex items-center justify-between flex-wrap gap-2.5 shadow-inner">
+                <div class="flex items-center gap-2.5 text-xs">
+                  <div class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <i class="fa-solid fa-calculator text-xs"></i>
+                  </div>
+                  <span class="font-bold text-slate-200">รวม</span>
+                  <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>ผลรวมทั้งสิ้น (<span x-text="formatNumber(getGeneralWasteSummary().count)"></span> รายการ):</span>
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-4 sm:gap-6 text-xs ml-auto">
+                  <div class="text-right">
+                    <div class="text-xs sm:text-sm font-bold text-white font-mono" x-text="`${formatNumber(getGeneralWasteSummary().totalGeneral, 2)} กก.`"></div>
+                    <div class="text-[10px] text-slate-400" x-text="`ทั่วไป: +${formatNumber(getGeneralWasteSummary().totalGeneral, 2)} | อินทรีย์: +${formatNumber(getGeneralWasteSummary().totalOrganic, 2)}`"></div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs sm:text-sm font-bold text-emerald-400 font-mono" x-text="`${formatNumber(getGeneralWasteSummary().totalAll, 2)} กก.`"></div>
+                    <div class="text-[10px] text-slate-400">รวมขยะทั้งสิ้น</div>
+                  </div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-1 flex-wrap" x-show="getTotalPages(filteredGeneralWaste(), 'general_waste') > 1">
-                <button @click="setPage('general_waste', 1, getTotalPages(filteredGeneralWaste(), 'general_waste'))"
-                  :disabled="pagination.general_waste.page === 1"
-                  class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าแรก">
-                  <i class="fa-solid fa-angles-left"></i>
-                </button>
-                <button @click="setPage('general_waste', pagination.general_waste.page - 1, getTotalPages(filteredGeneralWaste(), 'general_waste'))"
-                  :disabled="pagination.general_waste.page === 1"
-                  class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าก่อนหน้า">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <template x-for="p in getPageNumbers(filteredGeneralWaste(), 'general_waste')">
-                  <span>
-                    <template x-if="p === '...'">
-                      <span class="px-2 py-1 text-slate-500 font-bold text-xs">...</span>
-                    </template>
-                    <template x-if="p !== '...'">
-                      <button @click="setPage('general_waste', p, getTotalPages(filteredGeneralWaste(), 'general_waste'))"
-                        :class="pagination.general_waste.page === p ? 'bg-emerald-600 text-white font-bold border-emerald-500 shadow' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'"
-                        class="min-w-[28px] h-7 px-2 text-xs rounded-lg border transition font-medium"
-                        x-text="p"></button>
-                    </template>
-                  </span>
-                </template>
-                <button @click="setPage('general_waste', pagination.general_waste.page + 1, getTotalPages(filteredGeneralWaste(), 'general_waste'))"
-                  :disabled="pagination.general_waste.page === getTotalPages(filteredGeneralWaste(), 'general_waste')"
-                  class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าถัดไป">
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-                <button @click="setPage('general_waste', getTotalPages(filteredGeneralWaste(), 'general_waste'), getTotalPages(filteredGeneralWaste(), 'general_waste'))"
-                  :disabled="pagination.general_waste.page === getTotalPages(filteredGeneralWaste(), 'general_waste')"
-                  class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าสุดท้าย">
-                  <i class="fa-solid fa-angles-right"></i>
-                </button>
+              <!-- 2. FOUR SUMMARY METRIC CARDS (การ์ดผลรวม 4 กล่อง) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                
+                <!-- CARD 1: จำนวนรายการทั้งหมด -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-slate-400 block">จำนวนรายการทั้งหมด</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-white font-mono tracking-tight" x-text="formatNumber(getGeneralWasteSummary().count)"></strong>
+                      <span class="text-xs text-slate-400 font-medium">รายการ</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500 block">ตามเงื่อนไขที่กรอง</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-list-check text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 2: ปริมาณขยะทั่วไปรวม -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-blue-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-blue-400 block">ขยะทั่วไปรวม (GENERAL)</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-blue-400 font-mono tracking-tight" x-text="formatNumber(getGeneralWasteSummary().totalGeneral, 2)"></strong>
+                      <span class="text-xs text-blue-500 font-medium">กก.</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block">ขยะทั่วไปทุกแผนก/หอผู้ป่วย</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-blue-950/60 border border-blue-800/60 flex items-center justify-center text-blue-400 shadow-inner">
+                    <i class="fa-solid fa-trash-can text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 3: ปริมาณขยะอินทรีย์รวม -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-emerald-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-emerald-400 block">ขยะอินทรีย์รวม (ORGANIC)</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-emerald-400 font-mono tracking-tight" x-text="formatNumber(getGeneralWasteSummary().totalOrganic, 2)"></strong>
+                      <span class="text-xs text-emerald-500 font-medium">กก.</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block">เศษอาหาร โภชนาการ/โรงอาหาร</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400 shadow-inner">
+                    <i class="fa-solid fa-leaf text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 4: สถานะตัวกรอง & การเลือก -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-amber-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-amber-400 block">สถานะตัวกรอง & การเลือก</span>
+                    <strong class="text-sm sm:text-base font-bold text-amber-300 block leading-snug">แสดงผลรวมทั้งหมด</strong>
+                    <span class="text-[10px] text-slate-400 block" x-text="`รวมมูลฝอยทั้งสิ้น ${formatNumber(getGeneralWasteSummary().totalAll, 2)} กก.`"></span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-800/60 flex items-center justify-center text-amber-400 shadow-inner">
+                    <i class="fa-solid fa-filter text-base"></i>
+                  </div>
+                </div>
+
               </div>
+
+              <!-- 3. PAGINATION CONTROLS: GENERAL WASTE -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-slate-400">
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span x-text="getPaginationRangeText(filteredGeneralWaste(), 'general_waste')" class="font-medium text-slate-300"></span>
+                  <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800">
+                    <span class="text-[11px] text-slate-400">แสดงหน้าละ:</span>
+                    <select @change="setPageSize('general_waste', $event.target.value)" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
+                      <option value="10" :selected="pagination.general_waste?.pageSize === 10">10</option>
+                      <option value="25" :selected="pagination.general_waste?.pageSize === 25">25</option>
+                      <option value="50" :selected="pagination.general_waste?.pageSize === 50">50</option>
+                      <option value="100" :selected="pagination.general_waste?.pageSize === 100">100</option>
+                      <option value="200" :selected="pagination.general_waste?.pageSize === 200">200</option>
+                      <option value="all" :selected="pagination.general_waste?.pageSize >= 99999">ทั้งหมด</option>
+                    </select>
+                    <span class="text-[11px] text-slate-400">แถว</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 flex-wrap" x-show="getTotalPages(filteredGeneralWaste(), 'general_waste') > 1">
+                  <button @click="setPage('general_waste', 1, getTotalPages(filteredGeneralWaste(), 'general_waste'))"
+                    :disabled="pagination.general_waste.page === 1"
+                    class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าแรก">
+                    <i class="fa-solid fa-angles-left"></i>
+                  </button>
+                  <button @click="setPage('general_waste', pagination.general_waste.page - 1, getTotalPages(filteredGeneralWaste(), 'general_waste'))"
+                    :disabled="pagination.general_waste.page === 1"
+                    class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าก่อนหน้า">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <template x-for="p in getPageNumbers(filteredGeneralWaste(), 'general_waste')">
+                    <span>
+                      <template x-if="p === '...'">
+                        <span class="px-2 py-1 text-slate-500 font-bold text-xs">...</span>
+                      </template>
+                      <template x-if="p !== '...'">
+                        <button @click="setPage('general_waste', p, getTotalPages(filteredGeneralWaste(), 'general_waste'))"
+                          :class="pagination.general_waste.page === p ? 'bg-emerald-600 text-white font-bold border-emerald-500 shadow' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'"
+                          class="min-w-[28px] h-7 px-2 text-xs rounded-lg border transition font-medium"
+                          x-text="p"></button>
+                      </template>
+                    </span>
+                  </template>
+                  <button @click="setPage('general_waste', pagination.general_waste.page + 1, getTotalPages(filteredGeneralWaste(), 'general_waste'))"
+                    :disabled="pagination.general_waste.page === getTotalPages(filteredGeneralWaste(), 'general_waste')"
+                    class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าถัดไป">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                  <button @click="setPage('general_waste', getTotalPages(filteredGeneralWaste(), 'general_waste'), getTotalPages(filteredGeneralWaste(), 'general_waste'))"
+                    :disabled="pagination.general_waste.page === getTotalPages(filteredGeneralWaste(), 'general_waste')"
+                    class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าสุดท้าย">
+                    <i class="fa-solid fa-angles-right"></i>
+                  </button>
+                  <div class="flex items-center gap-1 ml-1.5">
+                    <span class="text-[11px] text-slate-500">ไปหน้า:</span>
+                    <input type="number" min="1" :max="getTotalPages(filteredGeneralWaste(), 'general_waste')" 
+                           :value="pagination.general_waste.page"
+                           @change="setPage('general_waste', parseInt($event.target.value, 10), getTotalPages(filteredGeneralWaste(), 'general_waste'))"
+                           class="w-12 text-center bg-slate-950 border border-slate-700 rounded-lg py-0.5 px-1 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -1514,7 +1845,7 @@
                   </div>
                   <select x-model="subForm.year" class="w-full text-xs bg-slate-950/80 border border-slate-700/80 rounded-xl px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                     <template x-for="y in years">
-                      <option :value="y" x-text="y == getCurrentBEYear() ? `${y} (ปัจจุบัน)` : y"></option>
+                      <option :value="y" x-text="y"></option>
                     </template>
                   </select>
                 </div>
@@ -1610,59 +1941,158 @@
               </table>
             </div>
 
-            <!-- PAGINATION CONTROLS: SUBDISTRICT WASTE -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 mt-2 border-t border-slate-800/80 text-xs text-slate-400">
-              <div class="flex items-center gap-3 flex-wrap">
-                <span x-text="getPaginationRangeText(filteredSubdistrictRecords(), 'subdistrict_waste')" class="font-medium text-slate-300"></span>
-                <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800">
-                  <span class="text-[11px] text-slate-400">แสดงหน้าละ:</span>
-                  <select @change="setPageSize('subdistrict_waste', $event.target.value)" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
-                    <option value="10" :selected="pagination.subdistrict_waste?.pageSize === 10">10</option>
-                    <option value="25" :selected="pagination.subdistrict_waste?.pageSize === 25">25</option>
-                    <option value="50" :selected="pagination.subdistrict_waste?.pageSize === 50">50</option>
-                    <option value="100" :selected="pagination.subdistrict_waste?.pageSize === 100">100</option>
-                    <option value="200" :selected="pagination.subdistrict_waste?.pageSize === 200">200</option>
-                    <option value="all" :selected="pagination.subdistrict_waste?.pageSize >= 99999">ทั้งหมด</option>
-                  </select>
-                  <span class="text-[11px] text-slate-400">แถว</span>
+            <!-- TOTALS & SUMMARY SECTION (ผลรวมทุกๆ หน้า: บันทึกข้อมูลขยะมูลฝอยติดเชื้อ รพ.สต. 21 แห่ง) -->
+            <div class="mt-4 pt-3 border-t border-slate-800/80 space-y-3">
+              
+              <!-- 1. TOP SUMMARY STRIP (แถบสรุปรวมด้านบน) -->
+              <div class="bg-slate-950/70 p-3 sm:px-4 sm:py-2.5 rounded-2xl border border-emerald-500/20 flex items-center justify-between flex-wrap gap-2.5 shadow-inner">
+                <div class="flex items-center gap-2.5 text-xs">
+                  <div class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <i class="fa-solid fa-calculator text-xs"></i>
+                  </div>
+                  <span class="font-bold text-slate-200">รวม</span>
+                  <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>ผลรวมทั้งสิ้น (<span x-text="formatNumber(getSubdistrictWasteSummary().count)"></span> รอบ/วัน):</span>
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-4 sm:gap-6 text-xs ml-auto">
+                  <div class="text-right">
+                    <div class="text-xs sm:text-sm font-bold text-white font-mono" x-text="`${formatNumber(getSubdistrictWasteSummary().totalKg, 2)} กก.`"></div>
+                    <div class="text-[10px] text-slate-400">รวมขยะติดเชื้อ รพ.สต. 21 แห่ง</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs sm:text-sm font-bold text-emerald-400 font-mono" x-text="`${formatNumber(getSubdistrictWasteSummary().totalCost, 2)} บาท`"></div>
+                    <div class="text-[10px] text-slate-400">คิดที่อัตรา 9.75 ฿/กก.</div>
+                  </div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-1 flex-wrap" x-show="getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste') > 1">
-                <button @click="setPage('subdistrict_waste', 1, getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
-                  :disabled="pagination.subdistrict_waste.page === 1"
-                  class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าแรก">
-                  <i class="fa-solid fa-angles-left"></i>
-                </button>
-                <button @click="setPage('subdistrict_waste', pagination.subdistrict_waste.page - 1, getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
-                  :disabled="pagination.subdistrict_waste.page === 1"
-                  class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าก่อนหน้า">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <template x-for="p in getPageNumbers(filteredSubdistrictRecords(), 'subdistrict_waste')">
-                  <span>
-                    <template x-if="p === '...'">
-                      <span class="px-2 py-1 text-slate-500 font-bold text-xs">...</span>
-                    </template>
-                    <template x-if="p !== '...'">
-                      <button @click="setPage('subdistrict_waste', p, getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
-                        :class="pagination.subdistrict_waste.page === p ? 'bg-emerald-600 text-white font-bold border-emerald-500 shadow' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'"
-                        class="min-w-[28px] h-7 px-2 text-xs rounded-lg border transition font-medium"
-                        x-text="p"></button>
-                    </template>
-                  </span>
-                </template>
-                <button @click="setPage('subdistrict_waste', pagination.subdistrict_waste.page + 1, getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
-                  :disabled="pagination.subdistrict_waste.page === getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste')"
-                  class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าถัดไป">
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-                <button @click="setPage('subdistrict_waste', getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'), getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
-                  :disabled="pagination.subdistrict_waste.page === getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste')"
-                  class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าสุดท้าย">
-                  <i class="fa-solid fa-angles-right"></i>
-                </button>
+              <!-- 2. FOUR SUMMARY METRIC CARDS (การ์ดผลรวม 4 กล่อง) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                
+                <!-- CARD 1: จำนวนรอบบันทึกทั้งหมด -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-slate-400 block">จำนวนรอบบันทึกทั้งหมด</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-white font-mono tracking-tight" x-text="formatNumber(getSubdistrictWasteSummary().count)"></strong>
+                      <span class="text-xs text-slate-400 font-medium">รอบ/วัน</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500 block">ตามเงื่อนไขที่กรอง</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-calendar-check text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 2: ปริมาณขยะติดเชื้อรวม -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-emerald-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-emerald-400 block">ขยะติดเชื้อ รพ.สต. รวม</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-emerald-400 font-mono tracking-tight" x-text="formatNumber(getSubdistrictWasteSummary().totalKg, 2)"></strong>
+                      <span class="text-xs text-emerald-500 font-medium">กก.</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block" x-text="`เฉลี่ย ${formatNumber(getSubdistrictWasteSummary().avgPerDay, 2)} กก./รอบ`"></span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400 shadow-inner">
+                    <i class="fa-solid fa-biohazard text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 3: มูลค่าการกำจัดรวม -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-sky-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-sky-400 block">มูลค่าการกำจัดรวม</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-sky-400 font-mono tracking-tight" x-text="formatNumber(getSubdistrictWasteSummary().totalCost, 2)"></strong>
+                      <span class="text-xs text-sky-500 font-medium">บาท</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block">คิดตามอัตรากำจัด 9.75 บาท/กก.</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-sky-950/60 border border-sky-800/60 flex items-center justify-center text-sky-400 shadow-inner">
+                    <i class="fa-solid fa-coins text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 4: สถานะเครือข่าย รพ.สต. -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-amber-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-amber-400 block">สถานะเครือข่าย รพ.สต.</span>
+                    <strong class="text-sm sm:text-base font-bold text-amber-300 block leading-snug">21 รพ.สต. ครบถ้วน</strong>
+                    <span class="text-[10px] text-slate-400 block">แสดงผลรวมทุกแห่งในตาราง</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-800/60 flex items-center justify-center text-amber-400 shadow-inner">
+                    <i class="fa-solid fa-hospital text-base"></i>
+                  </div>
+                </div>
+
               </div>
+
+              <!-- 3. PAGINATION CONTROLS: SUBDISTRICT WASTE -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-slate-400">
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span x-text="getPaginationRangeText(filteredSubdistrictRecords(), 'subdistrict_waste')" class="font-medium text-slate-300"></span>
+                  <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800">
+                    <span class="text-[11px] text-slate-400">แสดงหน้าละ:</span>
+                    <select @change="setPageSize('subdistrict_waste', $event.target.value)" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
+                      <option value="10" :selected="pagination.subdistrict_waste?.pageSize === 10">10</option>
+                      <option value="25" :selected="pagination.subdistrict_waste?.pageSize === 25">25</option>
+                      <option value="50" :selected="pagination.subdistrict_waste?.pageSize === 50">50</option>
+                      <option value="100" :selected="pagination.subdistrict_waste?.pageSize === 100">100</option>
+                      <option value="200" :selected="pagination.subdistrict_waste?.pageSize === 200">200</option>
+                      <option value="all" :selected="pagination.subdistrict_waste?.pageSize >= 99999">ทั้งหมด</option>
+                    </select>
+                    <span class="text-[11px] text-slate-400">แถว</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 flex-wrap" x-show="getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste') > 1">
+                  <button @click="setPage('subdistrict_waste', 1, getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
+                    :disabled="pagination.subdistrict_waste.page === 1"
+                    class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าแรก">
+                    <i class="fa-solid fa-angles-left"></i>
+                  </button>
+                  <button @click="setPage('subdistrict_waste', pagination.subdistrict_waste.page - 1, getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
+                    :disabled="pagination.subdistrict_waste.page === 1"
+                    class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าก่อนหน้า">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <template x-for="p in getPageNumbers(filteredSubdistrictRecords(), 'subdistrict_waste')">
+                    <span>
+                      <template x-if="p === '...'">
+                        <span class="px-2 py-1 text-slate-500 font-bold text-xs">...</span>
+                      </template>
+                      <template x-if="p !== '...'">
+                        <button @click="setPage('subdistrict_waste', p, getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
+                          :class="pagination.subdistrict_waste.page === p ? 'bg-emerald-600 text-white font-bold border-emerald-500 shadow' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'"
+                          class="min-w-[28px] h-7 px-2 text-xs rounded-lg border transition font-medium"
+                          x-text="p"></button>
+                      </template>
+                    </span>
+                  </template>
+                  <button @click="setPage('subdistrict_waste', pagination.subdistrict_waste.page + 1, getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
+                    :disabled="pagination.subdistrict_waste.page === getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste')"
+                    class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าถัดไป">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                  <button @click="setPage('subdistrict_waste', getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'), getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
+                    :disabled="pagination.subdistrict_waste.page === getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste')"
+                    class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าสุดท้าย">
+                    <i class="fa-solid fa-angles-right"></i>
+                  </button>
+                  <div class="flex items-center gap-1 ml-1.5">
+                    <span class="text-[11px] text-slate-500">ไปหน้า:</span>
+                    <input type="number" min="1" :max="getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste')" 
+                           :value="pagination.subdistrict_waste.page"
+                           @change="setPage('subdistrict_waste', parseInt($event.target.value, 10), getTotalPages(filteredSubdistrictRecords(), 'subdistrict_waste'))"
+                           class="w-12 text-center bg-slate-950 border border-slate-700 rounded-lg py-0.5 px-1 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500">
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -1958,7 +2388,7 @@
                 </div>
                 <select x-model="infHazForm.year" class="w-full text-xs bg-slate-950/80 border border-slate-700/80 rounded-xl px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                   <template x-for="y in years">
-                    <option :value="y" x-text="y == getCurrentBEYear() ? `${y} (ปัจจุบัน)` : y"></option>
+                    <option :value="y" x-text="y"></option>
                   </template>
                 </select>
               </div>
@@ -2080,59 +2510,158 @@
               </table>
             </div>
 
-            <!-- PAGINATION CONTROLS: INFECTIOUS HAZARDOUS -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 mt-2 border-t border-slate-800/80 text-xs text-slate-400">
-              <div class="flex items-center gap-3 flex-wrap">
-                <span x-text="getPaginationRangeText(filteredInfHazRecords(), 'infectious_hazardous')" class="font-medium text-slate-300"></span>
-                <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800">
-                  <span class="text-[11px] text-slate-400">แสดงหน้าละ:</span>
-                  <select @change="setPageSize('infectious_hazardous', $event.target.value)" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
-                    <option value="10" :selected="pagination.infectious_hazardous?.pageSize === 10">10</option>
-                    <option value="25" :selected="pagination.infectious_hazardous?.pageSize === 25">25</option>
-                    <option value="50" :selected="pagination.infectious_hazardous?.pageSize === 50">50</option>
-                    <option value="100" :selected="pagination.infectious_hazardous?.pageSize === 100">100</option>
-                    <option value="200" :selected="pagination.infectious_hazardous?.pageSize === 200">200</option>
-                    <option value="all" :selected="pagination.infectious_hazardous?.pageSize >= 99999">ทั้งหมด</option>
-                  </select>
-                  <span class="text-[11px] text-slate-400">แถว</span>
+            <!-- TOTALS & SUMMARY SECTION (ผลรวมทุกๆ หน้า: บันทึกข้อมูลขยะติดเชื้อ และมูลฝอยอันตราย รพ.หลัก) -->
+            <div class="mt-4 pt-3 border-t border-slate-800/80 space-y-3">
+              
+              <!-- 1. TOP SUMMARY STRIP (แถบสรุปรวมด้านบน) -->
+              <div class="bg-slate-950/70 p-3 sm:px-4 sm:py-2.5 rounded-2xl border border-emerald-500/20 flex items-center justify-between flex-wrap gap-2.5 shadow-inner">
+                <div class="flex items-center gap-2.5 text-xs">
+                  <div class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <i class="fa-solid fa-calculator text-xs"></i>
+                  </div>
+                  <span class="font-bold text-slate-200">รวม</span>
+                  <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>ผลรวมทั้งสิ้น (<span x-text="formatNumber(getInfHazSummary().count)"></span> รายการ):</span>
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-4 sm:gap-6 text-xs ml-auto">
+                  <div class="text-right">
+                    <div class="text-xs sm:text-sm font-bold text-white font-mono" x-text="`${formatNumber(getInfHazSummary().totalInf, 2)} กก.`"></div>
+                    <div class="text-[10px] text-slate-400" x-text="`ติดเชื้อ: +${formatNumber(getInfHazSummary().totalInf, 2)} | อันตราย: +${formatNumber(getInfHazSummary().totalHaz, 2)}`"></div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs sm:text-sm font-bold text-emerald-400 font-mono" x-text="`${formatNumber(getInfHazSummary().totalAll, 2)} กก.`"></div>
+                    <div class="text-[10px] text-slate-400">รวมขยะติดเชื้อ+อันตรายทั้งสิ้น</div>
+                  </div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-1 flex-wrap" x-show="getTotalPages(filteredInfHazRecords(), 'infectious_hazardous') > 1">
-                <button @click="setPage('infectious_hazardous', 1, getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
-                  :disabled="pagination.infectious_hazardous.page === 1"
-                  class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าแรก">
-                  <i class="fa-solid fa-angles-left"></i>
-                </button>
-                <button @click="setPage('infectious_hazardous', pagination.infectious_hazardous.page - 1, getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
-                  :disabled="pagination.infectious_hazardous.page === 1"
-                  class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าก่อนหน้า">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <template x-for="p in getPageNumbers(filteredInfHazRecords(), 'infectious_hazardous')">
-                  <span>
-                    <template x-if="p === '...'">
-                      <span class="px-2 py-1 text-slate-500 font-bold text-xs">...</span>
-                    </template>
-                    <template x-if="p !== '...'">
-                      <button @click="setPage('infectious_hazardous', p, getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
-                        :class="pagination.infectious_hazardous.page === p ? 'bg-purple-600 text-white font-bold border-purple-500 shadow' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'"
-                        class="min-w-[28px] h-7 px-2 text-xs rounded-lg border transition font-medium"
-                        x-text="p"></button>
-                    </template>
-                  </span>
-                </template>
-                <button @click="setPage('infectious_hazardous', pagination.infectious_hazardous.page + 1, getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
-                  :disabled="pagination.infectious_hazardous.page === getTotalPages(filteredInfHazRecords(), 'infectious_hazardous')"
-                  class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าถัดไป">
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-                <button @click="setPage('infectious_hazardous', getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'), getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
-                  :disabled="pagination.infectious_hazardous.page === getTotalPages(filteredInfHazRecords(), 'infectious_hazardous')"
-                  class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าสุดท้าย">
-                  <i class="fa-solid fa-angles-right"></i>
-                </button>
+              <!-- 2. FOUR SUMMARY METRIC CARDS (การ์ดผลรวม 4 กล่อง) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                
+                <!-- CARD 1: จำนวนรายการทั้งหมด -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-slate-400 block">จำนวนรายการทั้งหมด</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-white font-mono tracking-tight" x-text="formatNumber(getInfHazSummary().count)"></strong>
+                      <span class="text-xs text-slate-400 font-medium">รายการ</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500 block">ตามเงื่อนไขที่กรอง</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-list-check text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 2: ขยะติดเชื้อรวม -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-rose-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-rose-400 block">ขยะติดเชื้อรวม (INFECTIOUS)</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-rose-400 font-mono tracking-tight" x-text="formatNumber(getInfHazSummary().totalInf, 2)"></strong>
+                      <span class="text-xs text-rose-500 font-medium">กก.</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block" x-text="`มีคม: ${formatNumber(getInfHazSummary().totalSharp, 2)} | ไม่มีคม: ${formatNumber(getInfHazSummary().totalNonSharp, 2)}`"></span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-rose-950/60 border border-rose-800/60 flex items-center justify-center text-rose-400 shadow-inner">
+                    <i class="fa-solid fa-biohazard text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 3: ขยะอันตรายรวม -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-purple-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-purple-400 block">ขยะอันตรายรวม (HAZARDOUS)</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-purple-400 font-mono tracking-tight" x-text="formatNumber(getInfHazSummary().totalHaz, 2)"></strong>
+                      <span class="text-xs text-purple-500 font-medium">กก.</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block">เคมี / ยาเวชภัณฑ์ / อบจ. / รังสี</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-purple-950/60 border border-purple-800/60 flex items-center justify-center text-purple-400 shadow-inner">
+                    <i class="fa-solid fa-triangle-exclamation text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 4: สถานะตัวกรอง & การเลือก -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-amber-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-amber-400 block">สถานะตัวกรอง & การเลือก</span>
+                    <strong class="text-sm sm:text-base font-bold text-amber-300 block leading-snug">แสดงผลรวมทั้งหมด</strong>
+                    <span class="text-[10px] text-slate-400 block" x-text="`รวมทั้งสิ้น ${formatNumber(getInfHazSummary().totalAll, 2)} กก.`"></span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-800/60 flex items-center justify-center text-amber-400 shadow-inner">
+                    <i class="fa-solid fa-filter text-base"></i>
+                  </div>
+                </div>
+
               </div>
+
+              <!-- 3. PAGINATION CONTROLS: INFECTIOUS HAZARDOUS -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-slate-400">
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span x-text="getPaginationRangeText(filteredInfHazRecords(), 'infectious_hazardous')" class="font-medium text-slate-300"></span>
+                  <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800">
+                    <span class="text-[11px] text-slate-400">แสดงหน้าละ:</span>
+                    <select @change="setPageSize('infectious_hazardous', $event.target.value)" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
+                      <option value="10" :selected="pagination.infectious_hazardous?.pageSize === 10">10</option>
+                      <option value="25" :selected="pagination.infectious_hazardous?.pageSize === 25">25</option>
+                      <option value="50" :selected="pagination.infectious_hazardous?.pageSize === 50">50</option>
+                      <option value="100" :selected="pagination.infectious_hazardous?.pageSize === 100">100</option>
+                      <option value="200" :selected="pagination.infectious_hazardous?.pageSize === 200">200</option>
+                      <option value="all" :selected="pagination.infectious_hazardous?.pageSize >= 99999">ทั้งหมด</option>
+                    </select>
+                    <span class="text-[11px] text-slate-400">แถว</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 flex-wrap" x-show="getTotalPages(filteredInfHazRecords(), 'infectious_hazardous') > 1">
+                  <button @click="setPage('infectious_hazardous', 1, getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
+                    :disabled="pagination.infectious_hazardous.page === 1"
+                    class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าแรก">
+                    <i class="fa-solid fa-angles-left"></i>
+                  </button>
+                  <button @click="setPage('infectious_hazardous', pagination.infectious_hazardous.page - 1, getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
+                    :disabled="pagination.infectious_hazardous.page === 1"
+                    class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าก่อนหน้า">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <template x-for="p in getPageNumbers(filteredInfHazRecords(), 'infectious_hazardous')">
+                    <span>
+                      <template x-if="p === '...'">
+                        <span class="px-2 py-1 text-slate-500 font-bold text-xs">...</span>
+                      </template>
+                      <template x-if="p !== '...'">
+                        <button @click="setPage('infectious_hazardous', p, getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
+                          :class="pagination.infectious_hazardous.page === p ? 'bg-purple-600 text-white font-bold border-purple-500 shadow' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'"
+                          class="min-w-[28px] h-7 px-2 text-xs rounded-lg border transition font-medium"
+                          x-text="p"></button>
+                      </template>
+                    </span>
+                  </template>
+                  <button @click="setPage('infectious_hazardous', pagination.infectious_hazardous.page + 1, getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
+                    :disabled="pagination.infectious_hazardous.page === getTotalPages(filteredInfHazRecords(), 'infectious_hazardous')"
+                    class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าถัดไป">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                  <button @click="setPage('infectious_hazardous', getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'), getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
+                    :disabled="pagination.infectious_hazardous.page === getTotalPages(filteredInfHazRecords(), 'infectious_hazardous')"
+                    class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าสุดท้าย">
+                    <i class="fa-solid fa-angles-right"></i>
+                  </button>
+                  <div class="flex items-center gap-1 ml-1.5">
+                    <span class="text-[11px] text-slate-500">ไปหน้า:</span>
+                    <input type="number" min="1" :max="getTotalPages(filteredInfHazRecords(), 'infectious_hazardous')" 
+                           :value="pagination.infectious_hazardous.page"
+                           @change="setPage('infectious_hazardous', parseInt($event.target.value, 10), getTotalPages(filteredInfHazRecords(), 'infectious_hazardous'))"
+                           class="w-12 text-center bg-slate-950 border border-slate-700 rounded-lg py-0.5 px-1 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500">
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -2203,60 +2732,159 @@
               </table>
             </div>
 
-            <!-- PAGINATION CONTROLS: DISPOSAL DETAILS -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 mt-2 border-t border-slate-800/80 text-xs text-slate-400">
-              <div class="flex items-center gap-3 flex-wrap">
-                <span x-text="getPaginationRangeText(filteredDisposalDetails(), 'disposal_detail')" class="font-medium text-slate-300"></span>
-                <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800">
-                  <span class="text-[11px] text-slate-400">แสดงหน้าละ:</span>
-                  <select @change="setPageSize('disposal_detail', $event.target.value)" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
-                    <option value="10" :selected="pagination.disposal_detail?.pageSize === 10">10</option>
-                    <option value="25" :selected="pagination.disposal_detail?.pageSize === 25">25</option>
-                    <option value="50" :selected="pagination.disposal_detail?.pageSize === 50">50</option>
-                    <option value="100" :selected="pagination.disposal_detail?.pageSize === 100">100</option>
-                    <option value="200" :selected="pagination.disposal_detail?.pageSize === 200">200</option>
-                    <option value="500" :selected="pagination.disposal_detail?.pageSize === 500">500</option>
-                    <option value="all" :selected="pagination.disposal_detail?.pageSize >= 99999">ทั้งหมด</option>
-                  </select>
-                  <span class="text-[11px] text-slate-400">แถว</span>
+            <!-- TOTALS & SUMMARY SECTION (ผลรวมทุกๆ หน้า: บันทึกข้อมูลขยะติดเชื้อบริษัทรับไปกำจัด รายถัง) -->
+            <div class="mt-4 pt-3 border-t border-slate-800/80 space-y-3">
+              
+              <!-- 1. TOP SUMMARY STRIP (แถบสรุปรวมด้านบน) -->
+              <div class="bg-slate-950/70 p-3 sm:px-4 sm:py-2.5 rounded-2xl border border-emerald-500/20 flex items-center justify-between flex-wrap gap-2.5 shadow-inner">
+                <div class="flex items-center gap-2.5 text-xs">
+                  <div class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <i class="fa-solid fa-calculator text-xs"></i>
+                  </div>
+                  <span class="font-bold text-slate-200">รวม</span>
+                  <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>ผลรวมทั้งสิ้น (<span x-text="formatNumber(getDisposalDetailSummary().count)"></span> รายการ):</span>
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-4 sm:gap-6 text-xs ml-auto">
+                  <div class="text-right">
+                    <div class="text-xs sm:text-sm font-bold text-white font-mono" x-text="`${formatNumber(getDisposalDetailSummary().totalNet, 2)} กก.`"></div>
+                    <div class="text-[10px] text-slate-400" x-text="`ชั่งได้: +${formatNumber(getDisposalDetailSummary().totalScale, 2)} | หักถัง: -${formatNumber(getDisposalDetailSummary().totalBin, 2)}`"></div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs sm:text-sm font-bold text-emerald-400 font-mono" x-text="`${formatNumber(getDisposalDetailSummary().totalCost, 2)} บาท`"></div>
+                    <div class="text-[10px] text-slate-400">คิดที่อัตรา 9.75 ฿/กก.</div>
+                  </div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-1 flex-wrap" x-show="getTotalPages(filteredDisposalDetails(), 'disposal_detail') > 1">
-                <button @click="setPage('disposal_detail', 1, getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
-                  :disabled="pagination.disposal_detail.page === 1"
-                  class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าแรก">
-                  <i class="fa-solid fa-angles-left"></i>
-                </button>
-                <button @click="setPage('disposal_detail', pagination.disposal_detail.page - 1, getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
-                  :disabled="pagination.disposal_detail.page === 1"
-                  class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าก่อนหน้า">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <template x-for="p in getPageNumbers(filteredDisposalDetails(), 'disposal_detail')">
-                  <span>
-                    <template x-if="p === '...'">
-                      <span class="px-2 py-1 text-slate-500 font-bold text-xs">...</span>
-                    </template>
-                    <template x-if="p !== '...'">
-                      <button @click="setPage('disposal_detail', p, getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
-                        :class="pagination.disposal_detail.page === p ? 'bg-pink-600 text-white font-bold border-pink-500 shadow' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'"
-                        class="min-w-[28px] h-7 px-2 text-xs rounded-lg border transition font-medium"
-                        x-text="p"></button>
-                    </template>
-                  </span>
-                </template>
-                <button @click="setPage('disposal_detail', pagination.disposal_detail.page + 1, getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
-                  :disabled="pagination.disposal_detail.page === getTotalPages(filteredDisposalDetails(), 'disposal_detail')"
-                  class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าถัดไป">
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-                <button @click="setPage('disposal_detail', getTotalPages(filteredDisposalDetails(), 'disposal_detail'), getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
-                  :disabled="pagination.disposal_detail.page === getTotalPages(filteredDisposalDetails(), 'disposal_detail')"
-                  class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าสุดท้าย">
-                  <i class="fa-solid fa-angles-right"></i>
-                </button>
+              <!-- 2. FOUR SUMMARY METRIC CARDS (การ์ดผลรวม 4 กล่อง) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                
+                <!-- CARD 1: จำนวนรายการทั้งหมด -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-slate-400 block">จำนวนรายการทั้งหมด</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-white font-mono tracking-tight" x-text="formatNumber(getDisposalDetailSummary().count)"></strong>
+                      <span class="text-xs text-slate-400 font-medium">รายการ</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500 block">ตามเงื่อนไขที่กรอง</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-list-check text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 2: ปริมาณรวม (TOTAL QTY / WEIGHT) -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-emerald-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-emerald-400 block">ปริมาณรวม (TOTAL QTY)</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-emerald-400 font-mono tracking-tight" x-text="formatNumber(getDisposalDetailSummary().totalNet, 2)"></strong>
+                      <span class="text-xs text-emerald-500 font-medium">กก.</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block" x-text="`ชั่งได้: +${formatNumber(getDisposalDetailSummary().totalScale, 2)} | หักถัง: -${formatNumber(getDisposalDetailSummary().totalBin, 2)}`"></span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400 shadow-inner">
+                    <i class="fa-solid fa-cubes-stacked text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 3: มูลค่ารวม (TOTAL VALUE) -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-sky-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-sky-400 block">มูลค่ารวม (TOTAL VALUE)</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-sky-400 font-mono tracking-tight" x-text="formatNumber(getDisposalDetailSummary().totalCost, 2)"></strong>
+                      <span class="text-xs text-sky-500 font-medium">บาท</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block">คิดตามอัตรากำจัด 9.75 บาท/กก.</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-sky-950/60 border border-sky-800/60 flex items-center justify-center text-sky-400 shadow-inner">
+                    <i class="fa-solid fa-coins text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 4: สถานะตัวกรอง & การเลือก -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-amber-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-amber-400 block">สถานะตัวกรอง & การเลือก</span>
+                    <strong class="text-sm sm:text-base font-bold text-amber-300 block leading-snug">แสดงผลรวมทั้งหมด</strong>
+                    <span class="text-[10px] text-slate-400 block">คำนวณตามเงื่อนไขตัวกรองปัจจุบัน</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-800/60 flex items-center justify-center text-amber-400 shadow-inner">
+                    <i class="fa-solid fa-filter text-base"></i>
+                  </div>
+                </div>
+
               </div>
+
+              <!-- 3. PAGINATION CONTROLS: DISPOSAL DETAILS -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-slate-400">
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span x-text="getPaginationRangeText(filteredDisposalDetails(), 'disposal_detail')" class="font-medium text-slate-300"></span>
+                  <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800">
+                    <span class="text-[11px] text-slate-400">แสดงหน้าละ:</span>
+                    <select @change="setPageSize('disposal_detail', $event.target.value)" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
+                      <option value="10" :selected="pagination.disposal_detail?.pageSize === 10">10</option>
+                      <option value="25" :selected="pagination.disposal_detail?.pageSize === 25">25</option>
+                      <option value="50" :selected="pagination.disposal_detail?.pageSize === 50">50</option>
+                      <option value="100" :selected="pagination.disposal_detail?.pageSize === 100">100</option>
+                      <option value="200" :selected="pagination.disposal_detail?.pageSize === 200">200</option>
+                      <option value="500" :selected="pagination.disposal_detail?.pageSize === 500">500</option>
+                      <option value="all" :selected="pagination.disposal_detail?.pageSize >= 99999">ทั้งหมด</option>
+                    </select>
+                    <span class="text-[11px] text-slate-400">แถว</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 flex-wrap" x-show="getTotalPages(filteredDisposalDetails(), 'disposal_detail') > 1">
+                  <button @click="setPage('disposal_detail', 1, getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
+                    :disabled="pagination.disposal_detail.page === 1"
+                    class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าแรก">
+                    <i class="fa-solid fa-angles-left"></i>
+                  </button>
+                  <button @click="setPage('disposal_detail', pagination.disposal_detail.page - 1, getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
+                    :disabled="pagination.disposal_detail.page === 1"
+                    class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าก่อนหน้า">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <template x-for="p in getPageNumbers(filteredDisposalDetails(), 'disposal_detail')">
+                    <span>
+                      <template x-if="p === '...'">
+                        <span class="px-2 py-1 text-slate-500 font-bold text-xs">...</span>
+                      </template>
+                      <template x-if="p !== '...'">
+                        <button @click="setPage('disposal_detail', p, getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
+                          :class="pagination.disposal_detail.page === p ? 'bg-pink-600 text-white font-bold border-pink-500 shadow' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'"
+                          class="min-w-[28px] h-7 px-2 text-xs rounded-lg border transition font-medium"
+                          x-text="p"></button>
+                      </template>
+                    </span>
+                  </template>
+                  <button @click="setPage('disposal_detail', pagination.disposal_detail.page + 1, getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
+                    :disabled="pagination.disposal_detail.page === getTotalPages(filteredDisposalDetails(), 'disposal_detail')"
+                    class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าถัดไป">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                  <button @click="setPage('disposal_detail', getTotalPages(filteredDisposalDetails(), 'disposal_detail'), getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
+                    :disabled="pagination.disposal_detail.page === getTotalPages(filteredDisposalDetails(), 'disposal_detail')"
+                    class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าสุดท้าย">
+                    <i class="fa-solid fa-angles-right"></i>
+                  </button>
+                  <div class="flex items-center gap-1 ml-1.5">
+                    <span class="text-[11px] text-slate-500">ไปหน้า:</span>
+                    <input type="number" min="1" :max="getTotalPages(filteredDisposalDetails(), 'disposal_detail')" 
+                           :value="pagination.disposal_detail.page"
+                           @change="setPage('disposal_detail', parseInt($event.target.value, 10), getTotalPages(filteredDisposalDetails(), 'disposal_detail'))"
+                           class="w-12 text-center bg-slate-950 border border-slate-700 rounded-lg py-0.5 px-1 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-pink-500">
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -2396,60 +3024,159 @@
               </table>
             </div>
 
-            <!-- PAGINATION CONTROLS: DISPOSAL HISTORY -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 mt-2 border-t border-slate-800/80 text-xs text-slate-400">
-              <div class="flex items-center gap-3 flex-wrap">
-                <span x-text="getPaginationRangeText(filteredDisposalHistory(), 'disposal_history')" class="font-medium text-slate-300"></span>
-                <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800">
-                  <span class="text-[11px] text-slate-400">แสดงหน้าละ:</span>
-                  <select @change="setPageSize('disposal_history', $event.target.value)" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
-                    <option value="10" :selected="pagination.disposal_history?.pageSize === 10">10</option>
-                    <option value="25" :selected="pagination.disposal_history?.pageSize === 25">25</option>
-                    <option value="50" :selected="pagination.disposal_history?.pageSize === 50">50</option>
-                    <option value="100" :selected="pagination.disposal_history?.pageSize === 100">100</option>
-                    <option value="200" :selected="pagination.disposal_history?.pageSize === 200">200</option>
-                    <option value="500" :selected="pagination.disposal_history?.pageSize === 500">500</option>
-                    <option value="all" :selected="pagination.disposal_history?.pageSize >= 99999">ทั้งหมด</option>
-                  </select>
-                  <span class="text-[11px] text-slate-400">แถว</span>
+            <!-- TOTALS & SUMMARY SECTION (ผลรวมทุกๆ หน้า: ประวัติบันทึกข้อมูลขยะติดเชื้อบริษัทรับไปกำจัด สรุปรวมรายบิล) -->
+            <div class="mt-4 pt-3 border-t border-slate-800/80 space-y-3">
+              
+              <!-- 1. TOP SUMMARY STRIP (แถบสรุปรวมด้านบน) -->
+              <div class="bg-slate-950/70 p-3 sm:px-4 sm:py-2.5 rounded-2xl border border-emerald-500/20 flex items-center justify-between flex-wrap gap-2.5 shadow-inner">
+                <div class="flex items-center gap-2.5 text-xs">
+                  <div class="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <i class="fa-solid fa-calculator text-xs"></i>
+                  </div>
+                  <span class="font-bold text-slate-200">รวม</span>
+                  <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>ผลรวมทั้งสิ้น (<span x-text="formatNumber(getDisposalHistorySummary().count)"></span> บิล):</span>
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-4 sm:gap-6 text-xs ml-auto">
+                  <div class="text-right">
+                    <div class="text-xs sm:text-sm font-bold text-white font-mono" x-text="`${formatNumber(getDisposalHistorySummary().totalNet, 2)} กก.`"></div>
+                    <div class="text-[10px] text-slate-400" x-text="`ชั่งได้: +${formatNumber(getDisposalHistorySummary().totalScale, 2)} | หักถัง: -${formatNumber(getDisposalHistorySummary().totalBin, 2)}`"></div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-xs sm:text-sm font-bold text-emerald-400 font-mono" x-text="`${formatNumber(getDisposalHistorySummary().totalCost, 2)} บาท`"></div>
+                    <div class="text-[10px] text-slate-400">คิดที่อัตรา 9.75 ฿/กก.</div>
+                  </div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-1 flex-wrap" x-show="getTotalPages(filteredDisposalHistory(), 'disposal_history') > 1">
-                <button @click="setPage('disposal_history', 1, getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
-                  :disabled="pagination.disposal_history.page === 1"
-                  class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าแรก">
-                  <i class="fa-solid fa-angles-left"></i>
-                </button>
-                <button @click="setPage('disposal_history', pagination.disposal_history.page - 1, getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
-                  :disabled="pagination.disposal_history.page === 1"
-                  class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าก่อนหน้า">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <template x-for="p in getPageNumbers(filteredDisposalHistory(), 'disposal_history')">
-                  <span>
-                    <template x-if="p === '...'">
-                      <span class="px-2 py-1 text-slate-500 font-bold text-xs">...</span>
-                    </template>
-                    <template x-if="p !== '...'">
-                      <button @click="setPage('disposal_history', p, getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
-                        :class="pagination.disposal_history.page === p ? 'bg-blue-600 text-white font-bold border-blue-500 shadow' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'"
-                        class="min-w-[28px] h-7 px-2 text-xs rounded-lg border transition font-medium"
-                        x-text="p"></button>
-                    </template>
-                  </span>
-                </template>
-                <button @click="setPage('disposal_history', pagination.disposal_history.page + 1, getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
-                  :disabled="pagination.disposal_history.page === getTotalPages(filteredDisposalHistory(), 'disposal_history')"
-                  class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าถัดไป">
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-                <button @click="setPage('disposal_history', getTotalPages(filteredDisposalHistory(), 'disposal_history'), getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
-                  :disabled="pagination.disposal_history.page === getTotalPages(filteredDisposalHistory(), 'disposal_history')"
-                  class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าสุดท้าย">
-                  <i class="fa-solid fa-angles-right"></i>
-                </button>
+              <!-- 2. FOUR SUMMARY METRIC CARDS (การ์ดผลรวม 4 กล่อง) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                
+                <!-- CARD 1: จำนวนบิลส่งกำจัดทั้งหมด -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-slate-400 block">จำนวนบิลส่งกำจัดทั้งหมด</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-white font-mono tracking-tight" x-text="formatNumber(getDisposalHistorySummary().count)"></strong>
+                      <span class="text-xs text-slate-400 font-medium">บิล</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500 block">ตามเงื่อนไขที่กรอง</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-file-invoice-dollar text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 2: น้ำหนักสุทธิรวมทุกบิล -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-emerald-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-emerald-400 block">น้ำหนักสุทธิรวมทุกบิล (TOTAL NET)</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-emerald-400 font-mono tracking-tight" x-text="formatNumber(getDisposalHistorySummary().totalNet, 2)"></strong>
+                      <span class="text-xs text-emerald-500 font-medium">กก.</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block" x-text="`เฉลี่ย ${formatNumber(getDisposalHistorySummary().avgPerBill, 2)} กก./บิล`"></span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400 shadow-inner">
+                    <i class="fa-solid fa-weight-hanging text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 3: มูลค่าการกำจัดรวม -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-sky-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-sky-400 block">มูลค่าการกำจัดรวม</span>
+                    <div class="flex items-baseline gap-1.5">
+                      <strong class="text-xl sm:text-2xl font-black text-sky-400 font-mono tracking-tight" x-text="formatNumber(getDisposalHistorySummary().totalCost, 2)"></strong>
+                      <span class="text-xs text-sky-500 font-medium">บาท</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 block">คิดตามอัตรากำจัด 9.75 บาท/กก.</span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-sky-950/60 border border-sky-800/60 flex items-center justify-center text-sky-400 shadow-inner">
+                    <i class="fa-solid fa-coins text-base"></i>
+                  </div>
+                </div>
+
+                <!-- CARD 4: สถานะตัวกรอง & การเลือก -->
+                <div class="bg-[#0f172a]/90 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between hover:border-amber-900/50 transition shadow-sm">
+                  <div class="space-y-0.5">
+                    <span class="text-[11px] font-semibold text-amber-400 block">สถานะตัวกรอง & การเลือก</span>
+                    <strong class="text-sm sm:text-base font-bold text-amber-300 block leading-snug">แสดงผลรวมทั้งหมด</strong>
+                    <span class="text-[10px] text-slate-400 block" x-text="`ชั่งได้ +${formatNumber(getDisposalHistorySummary().totalScale, 2)} หักถัง -${formatNumber(getDisposalHistorySummary().totalBin, 2)} กก.`"></span>
+                  </div>
+                  <div class="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-800/60 flex items-center justify-center text-amber-400 shadow-inner">
+                    <i class="fa-solid fa-filter text-base"></i>
+                  </div>
+                </div>
+
               </div>
+
+              <!-- 3. PAGINATION CONTROLS: DISPOSAL HISTORY -->
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-slate-400">
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span x-text="getPaginationRangeText(filteredDisposalHistory(), 'disposal_history')" class="font-medium text-slate-300"></span>
+                  <div class="flex items-center gap-1.5 bg-slate-950/80 px-2.5 py-1 rounded-xl border border-slate-800">
+                    <span class="text-[11px] text-slate-400">แสดงหน้าละ:</span>
+                    <select @change="setPageSize('disposal_history', $event.target.value)" class="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer text-xs">
+                      <option value="10" :selected="pagination.disposal_history?.pageSize === 10">10</option>
+                      <option value="25" :selected="pagination.disposal_history?.pageSize === 25">25</option>
+                      <option value="50" :selected="pagination.disposal_history?.pageSize === 50">50</option>
+                      <option value="100" :selected="pagination.disposal_history?.pageSize === 100">100</option>
+                      <option value="200" :selected="pagination.disposal_history?.pageSize === 200">200</option>
+                      <option value="500" :selected="pagination.disposal_history?.pageSize === 500">500</option>
+                      <option value="all" :selected="pagination.disposal_history?.pageSize >= 99999">ทั้งหมด</option>
+                    </select>
+                    <span class="text-[11px] text-slate-400">แถว</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1 flex-wrap" x-show="getTotalPages(filteredDisposalHistory(), 'disposal_history') > 1">
+                  <button @click="setPage('disposal_history', 1, getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
+                    :disabled="pagination.disposal_history.page === 1"
+                    class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าแรก">
+                    <i class="fa-solid fa-angles-left"></i>
+                  </button>
+                  <button @click="setPage('disposal_history', pagination.disposal_history.page - 1, getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
+                    :disabled="pagination.disposal_history.page === 1"
+                    class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าก่อนหน้า">
+                    <i class="fa-solid fa-chevron-left"></i>
+                  </button>
+                  <template x-for="p in getPageNumbers(filteredDisposalHistory(), 'disposal_history')">
+                    <span>
+                      <template x-if="p === '...'">
+                        <span class="px-2 py-1 text-slate-500 font-bold text-xs">...</span>
+                      </template>
+                      <template x-if="p !== '...'">
+                        <button @click="setPage('disposal_history', p, getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
+                          :class="pagination.disposal_history.page === p ? 'bg-blue-600 text-white font-bold border-blue-500 shadow' : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'"
+                          class="min-w-[28px] h-7 px-2 text-xs rounded-lg border transition font-medium"
+                          x-text="p"></button>
+                      </template>
+                    </span>
+                  </template>
+                  <button @click="setPage('disposal_history', pagination.disposal_history.page + 1, getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
+                    :disabled="pagination.disposal_history.page === getTotalPages(filteredDisposalHistory(), 'disposal_history')"
+                    class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าถัดไป">
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+                  <button @click="setPage('disposal_history', getTotalPages(filteredDisposalHistory(), 'disposal_history'), getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
+                    :disabled="pagination.disposal_history.page === getTotalPages(filteredDisposalHistory(), 'disposal_history')"
+                    class="px-2 py-1 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-lg border border-slate-800 transition text-[11px]" title="หน้าสุดท้าย">
+                    <i class="fa-solid fa-angles-right"></i>
+                  </button>
+                  <div class="flex items-center gap-1 ml-1.5">
+                    <span class="text-[11px] text-slate-500">ไปหน้า:</span>
+                    <input type="number" min="1" :max="getTotalPages(filteredDisposalHistory(), 'disposal_history')" 
+                           :value="pagination.disposal_history.page"
+                           @change="setPage('disposal_history', parseInt($event.target.value, 10), getTotalPages(filteredDisposalHistory(), 'disposal_history'))"
+                           class="w-12 text-center bg-slate-950 border border-slate-700 rounded-lg py-0.5 px-1 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -3766,14 +4493,43 @@
             </button>
           </div>
 
+          <!-- Hospital 330 Beds Parameters Banner -->
+          <div class="p-3 bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-purple-950/40 rounded-xl border border-indigo-800/40 space-y-1.5">
+            <div class="flex items-center justify-between flex-wrap gap-1 text-[11px]">
+              <span class="font-bold text-indigo-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-hospital text-xs text-indigo-400"></i>
+                <span>โมเดลพยากรณ์ขยะ รพ. ๕๐ พรรษาฯ (ขนาด 330 เตียง)</span>
+              </span>
+              <span class="text-[10px] text-emerald-400 font-semibold bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-800/50">วิเคราะห์ข้อมูลจริงทุกปี ➔ พยากรณ์ปี 2569+</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] pt-1">
+              <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block">ขนาดเตียงผู้ป่วย:</span>
+                <strong class="text-white">330 เตียง (BOR ~82%)</strong>
+              </div>
+              <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block">ผู้ป่วยนอก (OPD):</span>
+                <strong class="text-sky-300">~1,050 ราย/วัน</strong>
+              </div>
+              <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block">บุคลากร/เจ้าหน้าที่:</span>
+                <strong class="text-amber-300">760 คน</strong>
+              </div>
+              <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block">การแบ่งรอบบันทึก:</span>
+                <strong class="text-purple-300">เช้า 64% / บ่าย 36%</strong>
+              </div>
+            </div>
+          </div>
+
           <div class="border-t border-slate-800/80 pt-3 space-y-2 text-[11px] text-slate-300">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-check text-emerald-400"></i>
-              <span>สร้างข้อมูลมูลฝอยทั่วไปครบทั้ง <strong class="text-white" x-text="`${refDepartments.length || 20} แผนก`"></strong> วันละ 2 รอบ (รวม <strong class="text-amber-400 font-bold" x-text="`${(refDepartments.length || 20) * 2} รายการ/วัน`"></strong>)</span>
+              <span>สร้างข้อมูลมูลฝอยทั่วไปและขยะอินทรีย์ครบทั้ง <strong class="text-white" x-text="`${refDepartments.length || 50} แผนก`"></strong> วันละ 2 รอบ (รวม <strong class="text-amber-400 font-bold" x-text="`${(refDepartments.length || 50) * 2} รายการ/วัน`"></strong>)</span>
             </div>
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-check text-emerald-400"></i>
-              <span>กระจายน้ำหนักเฉลี่ยเดิมของแผนกออกเป็น 2 ช่วงเวลาอย่างสมจริง (เช้า 08:00-12:00 น. และบ่าย 13:00-16:00 น.)</span>
+              <span>กระจายน้ำหนักเฉลี่ยตามจริง (รอบเช้า 08:00-12:00 น. ~64% และรอบบ่าย 13:00-16:00 น. ~36%)</span>
             </div>
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-check text-emerald-400"></i>
@@ -3839,11 +4595,11 @@
           <div class="flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
               <span class="font-bold text-slate-100">เกณฑ์ค่าน้ำหนักเฉลี่ยและผู้รับผิดชอบรายแผนก</span>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-bold">ฐานข้อมูลปี 2567-2568 (+3% Growth)</span>
+              <span class="px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800 text-[10px] font-bold">โมเดล รพ. 330 เตียง & ทุกปีในระบบ</span>
             </div>
             <span class="text-[10px] text-slate-400" x-text="`ทั้งหมด ${refDepartments.length || 50} แผนก`"></span>
           </div>
-          <p class="text-[10px] text-slate-400">ระบบใช้ค่าน้ำหนักฐานนี้ในการกระจายรอบเช้า (60-68%) และรอบบ่าย (32-40%) พร้อมระบบประเมินแผนกใหม่ในอนาคตอัตโนมัติ</p>
+          <p class="text-[10px] text-slate-400">ระบบวิเคราะห์ข้อมูลจริงของทุกปีในระบบและแนวโน้มสำหรับปี 2569 และปีถัดไปตามอัตราการครองเตียงและจำนวนผู้รับบริการ</p>
           
           <!-- Search box -->
           <div class="relative pt-1">
@@ -4344,6 +5100,24 @@
     function appState() {
       return {
         currentTab: 'dashboard',
+        tabHistory: ['dashboard'],
+        tabHistoryIndex: 0,
+        tabOrder: ['dashboard', 'general_waste', 'subdistrict_waste', 'disposal', 'infectious_hazardous', 'disposal_detail', 'disposal_history', 'all_database', 'backup_restore', 'master_settings'],
+        tableLoadStatus: {
+          general_waste: 'none',
+          infectious_subdistricts: 'none',
+          infectious_disposal: 'none',
+          infectious_disposal_history: 'none',
+          infectious_hazardous_waste: 'none'
+        },
+        isLoadingTable: {
+          general_waste: false,
+          infectious_subdistricts: false,
+          infectious_disposal: false,
+          infectious_disposal_history: false,
+          infectious_hazardous_waste: false
+        },
+        theme: localStorage.getItem('hospital_waste_theme') || 'dark',
         sidebarOpen: false,        // Mobile/Tablet Drawer Toggle
         sidebarCollapsed: false,   // Desktop Sidebar Collapse Toggle
         isLoading: false,
@@ -4389,7 +5163,7 @@
           targetDate: new Date().toISOString().split('T')[0],
           startDate: new Date().toISOString().split('T')[0],
           endDate: new Date().toISOString().split('T')[0],
-          enableAutoDaily: localStorage.getItem('auto_daily_gen') === 'true'
+          enableAutoDaily: false
         },
         autoGenQuickForm: {
           startDay: new Date().getDate(),
@@ -4409,6 +5183,15 @@
           sort: 'desc',     // 'desc' (มากไปน้อย), 'asc' (น้อยไปมาก)
           type: 'both',     // 'both' (ทั่วไป + อินทรีย์), 'general' (ทั่วไป), 'organic' (อินทรีย์)
           mode: 'stacked'   // 'stacked' (แท่งซ้อน), 'grouped' (แท่งคู่)
+        },
+        // ข้อมูลเกณฑ์โมเดลโรงพยาบาล ๕๐ พรรษา มหาวชิราลงกรณ (ขนาด 330 เตียง)
+        hospitalProfile: {
+          totalBeds: 330,             // ขนาด 330 เตียง
+          bedOccupancyRate: 0.82,     // อัตราการครองเตียงเฉลี่ย 82% (~270 เตียงครองจริง/วัน)
+          dailyOpdVisits: 1050,       // จำนวนผู้รับบริการผู้ป่วยนอกเฉลี่ย 1,050 ราย/วัน
+          totalStaff: 760,            // บุคลากรและเจ้าหน้าที่ รพ. 760 คน
+          baseYear: 2568,             // ปีฐานข้อมูล
+          annualGrowthRate: 0.028     // แนวโน้มการเติบโตของปริมาณบริการ ~2.8% ต่อปี
         },
         deptBaselineSearch: '',
         newDeptBaselineForm: {
@@ -4753,13 +5536,39 @@
         carbonSourceChartInstance: null,
 
         initApp() {
+          this.initTheme();
+
+          // Initialize tab from location hash if present
+          try {
+            const hash = window.location.hash.replace('#', '');
+            if (hash && ['dashboard', 'general_waste', 'subdistrict_waste', 'infectious_hazardous', 'disposal_detail', 'disposal_history', 'all_database', 'master_settings', 'backup_restore'].includes(hash)) {
+              this.currentTab = hash;
+              this.tabHistory = [hash];
+              this.tabHistoryIndex = 0;
+            }
+
+            window.addEventListener('popstate', (e) => {
+              if (e.state && e.state.tab) {
+                this.currentTab = e.state.tab;
+                const idx = this.tabHistory.lastIndexOf(e.state.tab);
+                if (idx !== -1) {
+                  this.tabHistoryIndex = idx;
+                }
+              } else {
+                const h = window.location.hash.replace('#', '');
+                if (h && ['dashboard', 'general_waste', 'subdistrict_waste', 'infectious_hazardous', 'disposal_detail', 'disposal_history', 'all_database', 'master_settings', 'backup_restore'].includes(h)) {
+                  this.currentTab = h;
+                }
+              }
+            });
+          } catch(e) {}
+
           if (typeof ChartDataLabels !== 'undefined') {
             try {
               Chart.register(ChartDataLabels);
             } catch(e) {}
           }
           this.getCurrentBEYear();
-          this.showLoader(true, 'กำลังเตรียมระบบรักษาความปลอดภัย...');
           const savedUsername = localStorage.getItem('saved_username');
           if (savedUsername) {
             this.loginForm.username = savedUsername;
@@ -4780,6 +5589,8 @@
               this.deptBaselineMap = { ...this.deptBaselineMap, ...parsed };
             } catch(e) {}
           }
+          localStorage.removeItem('auto_daily_gen');
+          this.autoGenSettings.enableAutoDaily = false;
 
           if (this.isLoggedIn) {
             this.onUserLoggedIn();
@@ -4894,20 +5705,18 @@
           const yr = now.getFullYear();
           const beYr = String(yr + 543);
           if (preset === 'cur_month' || preset === 'this_month') {
-            const firstDay = new Date(yr, now.getMonth(), 1).toISOString().split('T')[0];
-            const lastDay = new Date(yr, now.getMonth() + 1, 0).toISOString().split('T')[0];
-            this.filters.startDate = firstDay;
-            this.filters.endDate = lastDay;
+            this.filters.startDate = '';
+            this.filters.endDate = '';
             this.filters.year = beYr;
             this.filters.month = this.months[now.getMonth()];
           } else if (preset === 'cur_year' || preset === 'current_year' || preset === 'year_2569') {
-            this.filters.startDate = `${yr}-01-01`;
-            this.filters.endDate = `${yr}-12-31`;
+            this.filters.startDate = '';
+            this.filters.endDate = '';
             this.filters.year = beYr;
             this.filters.month = '';
           } else if (preset === 'prev_year' || preset === 'year_2568') {
-            this.filters.startDate = `${yr - 1}-01-01`;
-            this.filters.endDate = `${yr - 1}-12-31`;
+            this.filters.startDate = '';
+            this.filters.endDate = '';
             this.filters.year = String(parseInt(beYr) - 1);
             this.filters.month = '';
           } else if (preset === 'all') {
@@ -4916,16 +5725,31 @@
           }
           this.invalidateFilterCache();
           this.recalculateAllStats();
+          if (this.currentTab === 'dashboard') {
+            this.$nextTick(() => {
+              setTimeout(() => { this.drawDashboardCharts(); }, 150);
+            });
+          }
           Swal.fire({
             title: 'ตั้งค่าตัวกรองสำเร็จ',
-            text: `กรองข้อมูล: ${this.filters.startDate} ถึง ${this.filters.endDate} (พ.ศ. ${this.filters.year || 'ทุกปี'})`,
+            text: `กรองข้อมูล: พ.ศ. ${this.filters.year || 'ทุกปี'} ${this.filters.month ? 'เดือน ' + this.filters.month : ''}`,
             icon: 'success',
             timer: 800,
             showConfirmButton: false
           });
         },
 
-        switchTab(tab) {
+        switchTab(tab, isNav = false) {
+          if (!isNav) {
+            if (this.currentTab !== tab) {
+              this.tabHistory = this.tabHistory.slice(0, this.tabHistoryIndex + 1);
+              this.tabHistory.push(tab);
+              this.tabHistoryIndex = this.tabHistory.length - 1;
+              try {
+                history.pushState({ tab }, '', '#' + tab);
+              } catch(e) {}
+            }
+          }
           this.currentTab = tab;
           if (window.innerWidth < 1024) {
             this.sidebarOpen = false;
@@ -4935,6 +5759,206 @@
             this.$nextTick(() => {
               setTimeout(() => { this.drawDashboardCharts(); }, 150);
             });
+          }
+          // โหลดข้อมูลแบบ On-Demand สำหรับแท็บที่เลือกทันที (หากยังไม่ได้โหลดเต็ม)
+          this.ensureTableLoadedForTab(tab);
+        },
+
+        canGoBack() {
+          return true; // แสดงผลและใช้งานได้ตลอดเวลา
+        },
+
+        canGoForward() {
+          return true; // แสดงผลและใช้งานได้ตลอดเวลา
+        },
+
+        goBack() {
+          if (this.tabHistoryIndex > 0) {
+            this.tabHistoryIndex--;
+            const prevTab = this.tabHistory[this.tabHistoryIndex];
+            try {
+              history.pushState({ tab: prevTab }, '', '#' + prevTab);
+            } catch(e) {}
+            this.switchTab(prevTab, true);
+          } else {
+            // เมื่ออยู่หน้าแรกสุด ให้วนกลับไปยังแท็บก่อนหน้าใน tabOrder
+            let curIdx = this.tabOrder.indexOf(this.currentTab);
+            if (curIdx === -1) curIdx = 0;
+            const prevIdx = (curIdx - 1 + this.tabOrder.length) % this.tabOrder.length;
+            this.switchTab(this.tabOrder[prevIdx]);
+          }
+        },
+
+        goForward() {
+          if (this.tabHistoryIndex < (this.tabHistory.length - 1)) {
+            this.tabHistoryIndex++;
+            const nextTab = this.tabHistory[this.tabHistoryIndex];
+            try {
+              history.pushState({ tab: nextTab }, '', '#' + nextTab);
+            } catch(e) {}
+            this.switchTab(nextTab, true);
+          } else {
+            // เมื่ออยู่หน้าท้ายสุด ให้วนไปยังแท็บถัดไปใน tabOrder
+            let curIdx = this.tabOrder.indexOf(this.currentTab);
+            if (curIdx === -1) curIdx = 0;
+            const nextIdx = (curIdx + 1) % this.tabOrder.length;
+            this.switchTab(this.tabOrder[nextIdx]);
+          }
+        },
+
+        async ensureTableLoadedForTab(tab) {
+          if (!this.isDbConnected || !this.sbClient) return;
+          const tableMap = {
+            'general_waste': 'general_waste',
+            'subdistrict_waste': 'infectious_subdistricts',
+            'disposal': 'infectious_disposal',
+            'disposal_detail': 'infectious_disposal',
+            'disposal_history': 'infectious_disposal_history',
+            'infectious_hazardous': 'infectious_hazardous_waste',
+            'all_database': 'all'
+          };
+          const target = tableMap[tab];
+          if (!target) return;
+
+          if (target === 'all') {
+            const tables = ['general_waste', 'infectious_subdistricts', 'infectious_disposal', 'infectious_disposal_history', 'infectious_hazardous_waste'];
+            for (const t of tables) {
+              if (this.tableLoadStatus[t] !== 'full') {
+                await this.loadFullTable(t);
+              }
+            }
+          } else {
+            if (this.tableLoadStatus[target] !== 'full') {
+              await this.loadFullTable(target);
+            }
+          }
+        },
+
+        async loadFullTable(tableName) {
+          if (!this.isDbConnected || !this.sbClient) return;
+          if (this.isLoadingTable[tableName] || this.tableLoadStatus[tableName] === 'full') return;
+
+          this.isLoadingTable[tableName] = true;
+          try {
+            const fullRows = await this.fetchTableData(tableName, false);
+            if (fullRows !== null) {
+              if (tableName === 'general_waste') this.generalWasteRecords = fullRows;
+              else if (tableName === 'infectious_subdistricts') this.subdistrictRecords = fullRows;
+              else if (tableName === 'infectious_disposal') this.disposalDetails = fullRows;
+              else if (tableName === 'infectious_disposal_history') this.disposalHistory = fullRows;
+              else if (tableName === 'infectious_hazardous_waste') this.infHazRecords = fullRows;
+
+              this.tableLoadStatus[tableName] = 'full';
+              this.invalidateFilterCache();
+              this.recalculateAllStats();
+              if (this.currentTab === 'dashboard') {
+                this.$nextTick(() => {
+                  setTimeout(() => { this.drawDashboardCharts(); }, 120);
+                });
+              }
+            }
+          } catch(err) {
+            console.warn(`Error loading full table ${tableName}:`, err);
+          } finally {
+            this.isLoadingTable[tableName] = false;
+          }
+        },
+
+        async loadRemainingTablesInBackground() {
+          if (!this.isDbConnected || !this.sbClient) return;
+          const tables = ['general_waste', 'infectious_subdistricts', 'infectious_disposal', 'infectious_disposal_history', 'infectious_hazardous_waste'];
+          for (const t of tables) {
+            if (this.isDbConnected && this.tableLoadStatus[t] !== 'full' && !this.isLoadingTable[t]) {
+              await new Promise(r => setTimeout(r, 600));
+              if (this.tableLoadStatus[t] !== 'full') {
+                await this.loadFullTable(t);
+              }
+            }
+          }
+        },
+
+        async fetchTableData(tableName, isInitial = false) {
+          if (!this.sbClient) return [];
+          try {
+            if (isInitial) {
+              try {
+                let query = this.sbClient.from(tableName).select('*');
+                if (['general_waste', 'infectious_subdistricts', 'infectious_disposal', 'infectious_disposal_history', 'infectious_hazardous_waste'].includes(tableName)) {
+                  query = query.order('created_at', { ascending: false }).limit(250);
+                } else {
+                  query = query.limit(250);
+                }
+                const { data, error } = await query;
+                if (!error && data) return data;
+              } catch(e) {}
+              const { data, error } = await this.sbClient.from(tableName).select('*').limit(250);
+              if (error) throw error;
+              return data || [];
+            }
+
+            let allRows = [];
+            let from = 0;
+            const step = 1000;
+            let hasMore = true;
+
+            while (hasMore) {
+              const { data, error } = await this.sbClient
+                .from(tableName)
+                .select('*')
+                .range(from, from + step - 1);
+
+              if (error) throw error;
+              if (data && data.length > 0) {
+                allRows.push(...data);
+                hasMore = data.length >= step;
+                from += step;
+              } else {
+                hasMore = false;
+              }
+            }
+            return allRows;
+          } catch (err) {
+            console.warn(`ล้มเหลวในการโหลดตาราง: ${tableName}`, err);
+            return null;
+          }
+        },
+
+        initTheme() {
+          const savedTheme = localStorage.getItem('hospital_waste_theme');
+          if (savedTheme === 'light' || savedTheme === 'dark') {
+            this.theme = savedTheme;
+          } else {
+            this.theme = 'dark';
+          }
+          this.applyThemeToDom();
+        },
+
+        toggleTheme() {
+          this.theme = this.theme === 'dark' ? 'light' : 'dark';
+          localStorage.setItem('hospital_waste_theme', this.theme);
+          this.applyThemeToDom();
+          if (this.currentTab === 'dashboard') {
+            this.$nextTick(() => {
+              setTimeout(() => { this.drawDashboardCharts(); }, 120);
+            });
+          }
+          Swal.fire({
+            title: this.theme === 'dark' ? 'เปลี่ยนเป็นธีมมืด (Dark)' : 'เปลี่ยนเป็นธีมสว่าง (Light)',
+            icon: 'success',
+            timer: 700,
+            showConfirmButton: false
+          });
+        },
+
+        applyThemeToDom() {
+          const isDark = this.theme === 'dark';
+          document.documentElement.classList.toggle('dark', isDark);
+          document.documentElement.classList.toggle('light-theme', !isDark);
+          document.body.classList.toggle('light-theme', !isDark);
+
+          if (typeof Chart !== 'undefined') {
+            Chart.defaults.color = isDark ? '#94a3b8' : '#475569';
+            Chart.defaults.borderColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
           }
         },
 
@@ -5007,6 +6031,119 @@
           const start = Math.min((cfg.page - 1) * cfg.pageSize + 1, dataList.length);
           const end = Math.min(cfg.page * cfg.pageSize, dataList.length);
           return `${start.toLocaleString()} - ${end.toLocaleString()} จาก ${dataList.length.toLocaleString()} รายการ (หน้า ${cfg.page}/${this.getTotalPages(dataList, tableKey)})`;
+        },
+
+        // ==================== PAGE SUMMARY COMPUTATIONS (ผลรวมของทุกๆ หน้า) ====================
+        getGeneralWasteSummary() {
+          const list = this.filteredGeneralWaste() || [];
+          let totalGen = 0;
+          let totalOrg = 0;
+          for (let i = 0; i < list.length; i++) {
+            totalGen += Number(list[i].general_kg) || 0;
+            totalOrg += Number(list[i].organic_kg) || 0;
+          }
+          return {
+            count: list.length,
+            totalGeneral: totalGen,
+            totalOrganic: totalOrg,
+            totalAll: totalGen + totalOrg
+          };
+        },
+
+        getSubdistrictWasteSummary() {
+          const list = this.filteredSubdistrictRecords() || [];
+          let totalKg = 0;
+          for (let i = 0; i < list.length; i++) {
+            const s = list[i];
+            for (let k = 1; k <= 21; k++) {
+              totalKg += Number(s[`subdistrict_${k}`]) || 0;
+            }
+          }
+          return {
+            count: list.length,
+            totalKg: totalKg,
+            totalCost: totalKg * 9.75,
+            subdistrictCount: 21,
+            avgPerDay: list.length > 0 ? (totalKg / list.length) : 0
+          };
+        },
+
+        getDisposalDetailSummary() {
+          const list = this.filteredDisposalDetails() || [];
+          let totalScale = 0;
+          let totalBin = 0;
+          let totalNet = 0;
+          let totalCost = 0;
+          for (let i = 0; i < list.length; i++) {
+            const d = list[i];
+            const sc = Number(d.scale_weight) || 0;
+            const bw = Number(d.bin_weight) || 0;
+            const nw = (d.net_weight !== undefined && d.net_weight !== null) ? Number(d.net_weight) : Math.max(0, sc - bw);
+            const cost = (d.disposal_cost !== undefined && d.disposal_cost !== null) ? Number(d.disposal_cost) : (nw * 9.75);
+            totalScale += sc;
+            totalBin += bw;
+            totalNet += nw;
+            totalCost += cost;
+          }
+          return {
+            count: list.length,
+            totalScale: totalScale,
+            totalBin: totalBin,
+            totalNet: totalNet,
+            totalCost: totalCost
+          };
+        },
+
+        getDisposalHistorySummary() {
+          const list = this.filteredDisposalHistory() || [];
+          let totalScale = 0;
+          let totalBin = 0;
+          let totalNet = 0;
+          let totalCost = 0;
+          for (let i = 0; i < list.length; i++) {
+            const h = list[i];
+            totalScale += Number(h.total_scale_weight) || 0;
+            totalBin += Number(h.total_bin_weight) || 0;
+            totalNet += Number(h.total_net_weight) || 0;
+            totalCost += Number(h.total_disposal_cost) || 0;
+          }
+          return {
+            count: list.length,
+            totalScale: totalScale,
+            totalBin: totalBin,
+            totalNet: totalNet,
+            totalCost: totalCost,
+            avgPerBill: list.length > 0 ? (totalNet / list.length) : 0
+          };
+        },
+
+        getInfHazSummary() {
+          const list = this.filteredInfHazRecords() || [];
+          let totalSharp = 0;
+          let totalNonSharp = 0;
+          let totalChemical = 0;
+          let totalMedical = 0;
+          let totalHousehold = 0;
+          let totalRadio = 0;
+          for (let i = 0; i < list.length; i++) {
+            const r = list[i];
+            totalSharp += Number(r.sharp_infectious) || 0;
+            totalNonSharp += Number(r.non_sharp_infectious) || 0;
+            totalChemical += Number(r.chemical_hazard) || 0;
+            totalMedical += Number(r.medical_hazard) || 0;
+            totalHousehold += Number(r.household_obg_hazard) || 0;
+            totalRadio += Number(r.radioactive_hazard) || 0;
+          }
+          const totalInf = totalSharp + totalNonSharp;
+          const totalHaz = totalChemical + totalMedical + totalHousehold + totalRadio;
+          return {
+            count: list.length,
+            totalSharp: totalSharp,
+            totalNonSharp: totalNonSharp,
+            totalInf: totalInf,
+            totalHaz: totalHaz,
+            totalAll: totalInf + totalHaz
+          };
         },
 
         getCurrentTargetTable() {
@@ -5518,13 +6655,11 @@
         },
 
         async refreshCurrentData() {
-          this.showLoader(true, 'กำลังรีเฟรชและอัปเดตข้อมูลล่าสุด...');
           if (this.isDbConnected && this.sbClient) {
             await this.fetchAllDataFromSupabase();
           } else {
             this.invalidateFilterCache();
             this.recalculateAllStats();
-            this.showLoader(false);
           }
           Swal.fire({
             title: 'รีเฟรชข้อมูลสำเร็จ',
@@ -5666,7 +6801,6 @@
             return null;
           }
         },
-
         cleanDate(dateStr) {
           if (!dateStr) return null;
           if (typeof dateStr === 'number' || (typeof dateStr === 'string' && /^\d{5}(\.\d+)?$/.test(String(dateStr).trim()))) {
@@ -5677,15 +6811,43 @@
           let str = String(dateStr).trim();
           if (!str || str === 'null' || str === 'undefined' || str === '-') return null;
 
-          let ymd = str.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
-          if (ymd) {
-            let year = parseInt(ymd[1], 10);
-            let month = String(parseInt(ymd[2], 10)).padStart(2, '0');
-            let day = String(parseInt(ymd[3], 10)).padStart(2, '0');
-            if (year > 2500) year -= 543;
-            return `${year}-${month}-${day}`;
+          // 1. RCV(YY)(MM)(DD) (e.g. RCV690829-001 or RCV660115-999)
+          const rcvM = str.match(/RCV(\d{2})(\d{2})(\d{2})/i);
+          if (rcvM) {
+            let yr = parseInt(rcvM[1], 10);
+            const mo = rcvM[2];
+            const dy = rcvM[3];
+            if (yr >= 50 && yr <= 99) yr = 2000 + (yr - 43);
+            else if (yr >= 0 && yr <= 49) yr = 2000 + yr;
+            return `${yr}-${mo}-${dy}`;
           }
 
+          // 2. Thai text date: e.g. "11 ส.ค. 2569" or "4 สิงหาคม 2569"
+          const thaiMonthMap = {
+            'ม.ค.': '01', 'มกราคม': '01',
+            'ก.พ.': '02', 'กุมภาพันธ์': '02',
+            'มี.ค.': '03', 'มีนาคม': '03',
+            'เม.ย.': '04', 'เมษายน': '04',
+            'พ.ค.': '05', 'พฤษภาคม': '05',
+            'มิ.ย.': '06', 'มิถุนายน': '06',
+            'ก.ค.': '07', 'กรกฎาคม': '07',
+            'ส.ค.': '08', 'สิงหาคม': '08',
+            'ก.ย.': '09', 'กันยายน': '09',
+            'ต.ค.': '10', 'ตุลาคม': '10',
+            'พ.ย.': '11', 'พฤศจิกายน': '11',
+            'ธ.ค.': '12', 'ธันวาคม': '12'
+          };
+          const thaiDateMatch = str.match(/^(\d{1,2})\s+([ก-๙\.]+)\s+(\d{4})/);
+          if (thaiDateMatch) {
+            const day = String(parseInt(thaiDateMatch[1], 10)).padStart(2, '0');
+            const moKey = thaiDateMatch[2].trim();
+            const mo = thaiMonthMap[moKey] || '01';
+            let yr = parseInt(thaiDateMatch[3], 10);
+            if (yr > 2500) yr -= 543;
+            return `${yr}-${mo}-${day}`;
+          }
+
+          // 3. DMY with optional time: e.g. "18/5/2026, 21:45:40" or "29/08/2569" or "29-08-2569"
           let dmy = str.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})/);
           if (dmy) {
             let day = String(parseInt(dmy[1], 10)).padStart(2, '0');
@@ -5695,6 +6857,17 @@
             return `${year}-${month}-${day}`;
           }
 
+          // 4. YMD with optional time: e.g. "2026-08-29" or "2569-08-29" or "2026/08/29 10:00:00"
+          let ymd = str.match(/^(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})/);
+          if (ymd) {
+            let year = parseInt(ymd[1], 10);
+            let month = String(parseInt(ymd[2], 10)).padStart(2, '0');
+            let day = String(parseInt(ymd[3], 10)).padStart(2, '0');
+            if (year > 2500) year -= 543;
+            return `${year}-${month}-${day}`;
+          }
+
+          // 5. Standard Date parsing fallback
           const d = new Date(str);
           if (!isNaN(d.getTime())) {
             let yr = d.getFullYear();
@@ -5704,7 +6877,7 @@
             return `${yr}-${mo}-${dy}`;
           }
 
-          return str;
+          return null;
         },
 
         cleanTimestamp(val) {
@@ -5762,24 +6935,10 @@
         },
 
         async connectAndLoadBackground() {
-          // แสดง toast เล็กๆ แทน full-screen loader
-          const toastEl = Swal.mixin({
-            toast: true,
-            position: 'bottom-end',
-            showConfirmButton: false,
-            timer: 0,
-            timerProgressBar: false,
-            background: '#0f172a',
-            color: '#94a3b8',
-            customClass: { popup: 'border border-slate-700 rounded-2xl shadow-xl !text-xs' }
-          });
-
           try {
             this.sbClient = supabase.createClient(this.dbConfig.url, this.dbConfig.anonKey);
 
-            // ---- ขั้นที่ 1: ตรวจสอบการเชื่อมต่อ + โหลด ref tables (เล็ก, เร็ว) ----
-            toastEl.fire({ icon: 'info', title: '🔗 กำลังเชื่อมต่อฐานข้อมูล...' });
-
+            // ---- ขั้นที่ 1: ตรวจสอบการเชื่อมต่อ + โหลด ref tables (เร็ว <100ms) ----
             const [binsRes, deptsRes, companiesRes] = await Promise.all([
               this.sbClient.from('ref_bins').select('*'),
               this.sbClient.from('ref_departments').select('*'),
@@ -5797,71 +6956,46 @@
             localStorage.setItem('sb_url', this.dbConfig.url);
             localStorage.setItem('sb_anon', this.dbConfig.anonKey);
 
-            // ---- ขั้นที่ 2: โหลด data tables แบบ parallel ทั้งหมดพร้อมกัน ----
-            toastEl.fire({ icon: 'info', title: '📥 กำลังโหลดข้อมูล...' });
-
-            const loadTableParallel = async (tableName) => {
-              try {
-                let allRows = [];
-                let from = 0;
-                const step = 1000;
-                let hasMore = true;
-
-                while (hasMore) {
-                  const { data, error } = await this.sbClient
-                    .from(tableName)
-                    .select('*')
-                    .range(from, from + step - 1);
-
-                  if (error) throw error;
-                  if (data && data.length > 0) {
-                    allRows.push(...data);
-                    hasMore = data.length >= step;
-                    from += step;
-                  } else {
-                    hasMore = false;
-                  }
-                }
-                return allRows;
-              } catch (err) {
-                console.warn(`ล้มเหลวในการโหลดตาราง: ${tableName}`, err);
-                return [];
-              }
-            };
-
-            // โหลดทุกตารางพร้อมกัน (parallel)
+            // ---- ขั้นที่ 2: โหลดข้อมูลจำเป็นเริ่มต้น (Essential Data) เพื่อเปิดหน้าต่างและแสดงผลทันที (<300ms) ----
             const [genWaste, subdistricts, disposal, disposalHist, infHaz] = await Promise.all([
-              loadTableParallel('general_waste'),
-              loadTableParallel('infectious_subdistricts'),
-              loadTableParallel('infectious_disposal'),
-              loadTableParallel('infectious_disposal_history'),
-              loadTableParallel('infectious_hazardous_waste')
+              this.fetchTableData('general_waste', true),
+              this.fetchTableData('infectious_subdistricts', true),
+              this.fetchTableData('infectious_disposal', true),
+              this.fetchTableData('infectious_disposal_history', true),
+              this.fetchTableData('infectious_hazardous_waste', true)
             ]);
 
-            this.generalWasteRecords = genWaste;
-            this.subdistrictRecords = subdistricts;
-            this.disposalDetails = disposal;
-            this.disposalHistory = disposalHist;
-            this.infHazRecords = infHaz;
+            if (genWaste !== null) this.generalWasteRecords = genWaste;
+            if (subdistricts !== null) this.subdistrictRecords = subdistricts;
+            if (disposal !== null) this.disposalDetails = disposal;
+            if (disposalHist !== null) this.disposalHistory = disposalHist;
+            if (infHaz !== null) this.infHazRecords = infHaz;
+
+            ['general_waste', 'infectious_subdistricts', 'infectious_disposal', 'infectious_disposal_history', 'infectious_hazardous_waste'].forEach(t => {
+              this.tableLoadStatus[t] = 'initial';
+            });
 
             this.invalidateFilterCache();
             this.recalculateAllStats();
-            this.checkAutoDailyRunOnLogin();
 
             if (this.currentTab === 'dashboard') {
               this.$nextTick(() => {
-                setTimeout(() => { this.drawDashboardCharts(); }, 200);
+                setTimeout(() => { this.drawDashboardCharts(); }, 100);
               });
+            } else {
+              this.ensureTableLoadedForTab(this.currentTab);
             }
 
-            toastEl.fire({ icon: 'success', title: '✅ โหลดข้อมูลเสร็จสมบูรณ์', timer: 2000 });
+            // ---- ขั้นที่ 3: โหลดข้อมูลที่เหลืออย่างต่อเนื่องในพื้นหลัง (Background Loading) ----
+            setTimeout(() => {
+              this.loadRemainingTablesInBackground();
+            }, 600);
 
           } catch (err) {
             console.error('Supabase connection/load error:', err);
             this.isDbConnected = false;
             this.initMockDatabase();
             this.recalculateAllStats();
-            toastEl.fire({ icon: 'error', title: '⚠️ เชื่อมต่อฐานข้อมูลล้มเหลว', timer: 3000 });
           }
         },
 
@@ -6125,7 +7259,6 @@
             return;
           }
 
-          this.showLoader(true, 'กำลังเชื่อมโยงกับเซิร์ฟเวอร์...');
           try {
             this.sbClient = supabase.createClient(this.dbConfig.url, this.dbConfig.anonKey);
             const { error } = await this.sbClient.from('ref_bins').select('id').limit(1);
@@ -6135,7 +7268,7 @@
             localStorage.setItem('sb_anon', this.dbConfig.anonKey);
             this.isDbConnected = true;
             this.showDbConfigModal = false;
-            await this.fetchAllDataFromSupabase();
+            await this.connectAndLoadBackground();
           } catch (err) {
             console.error(err);
             this.isDbConnected = false;
@@ -6151,69 +7284,35 @@
                 icon: 'error'
               });
             }
-          } finally {
-            this.showLoader(false);
           }
         },
 
         async fetchAllDataFromSupabase() {
           if (!this.isDbConnected || !this.sbClient) return;
-          this.showLoader(true, 'กำลังอัปเดตข้อมูลจาก Supabase...');
 
-          const loadTableParallel = async (tableName) => {
-            try {
-              let allRows = [];
-              let from = 0;
-              const step = 1000;
-              let hasMore = true;
-
-              while (hasMore) {
-                const { data, error } = await this.sbClient
-                  .from(tableName)
-                  .select('*')
-                  .range(from, from + step - 1);
-
-                if (error) throw error;
-                if (data && data.length > 0) {
-                  allRows.push(...data);
-                  hasMore = data.length >= step;
-                  from += step;
-                } else {
-                  hasMore = false;
-                }
-              }
-              return allRows;
-            } catch (err) {
-              console.warn(`ล้มเหลวในการโหลดตาราง: ${tableName}`, err);
-              return null; // null = error (แยกจาก [] = ว่างเปล่า)
-            }
-          };
-
-          // โหลดทุกตารางพร้อมกัน (parallel)
+          // โหลดทุกตารางพร้อมกัน (parallel) ในพื้นหลังโดยไม่บล็อกหน้าจอ
           const [bins, depts, companies, genWaste, subdistricts, disposal, disposalHist, infHaz] = await Promise.all([
-            loadTableParallel('ref_bins'),
-            loadTableParallel('ref_departments'),
-            loadTableParallel('ref_companies'),
-            loadTableParallel('general_waste'),
-            loadTableParallel('infectious_subdistricts'),
-            loadTableParallel('infectious_disposal'),
-            loadTableParallel('infectious_disposal_history'),
-            loadTableParallel('infectious_hazardous_waste')
+            this.fetchTableData('ref_bins', false),
+            this.fetchTableData('ref_departments', false),
+            this.fetchTableData('ref_companies', false),
+            this.fetchTableData('general_waste', false),
+            this.fetchTableData('infectious_subdistricts', false),
+            this.fetchTableData('infectious_disposal', false),
+            this.fetchTableData('infectious_disposal_history', false),
+            this.fetchTableData('infectious_hazardous_waste', false)
           ]);
 
           if (bins !== null) this.refBins = bins;
           if (depts !== null) this.refDepartments = depts;
           if (companies !== null) this.refCompanies = companies;
-          if (genWaste !== null) this.generalWasteRecords = genWaste;
-          if (subdistricts !== null) this.subdistrictRecords = subdistricts;
-          if (disposal !== null) this.disposalDetails = disposal;
-          if (disposalHist !== null) this.disposalHistory = disposalHist;
-          if (infHaz !== null) this.infHazRecords = infHaz;
+          if (genWaste !== null) { this.generalWasteRecords = genWaste; this.tableLoadStatus.general_waste = 'full'; }
+          if (subdistricts !== null) { this.subdistrictRecords = subdistricts; this.tableLoadStatus.infectious_subdistricts = 'full'; }
+          if (disposal !== null) { this.disposalDetails = disposal; this.tableLoadStatus.infectious_disposal = 'full'; }
+          if (disposalHist !== null) { this.disposalHistory = disposalHist; this.tableLoadStatus.infectious_disposal_history = 'full'; }
+          if (infHaz !== null) { this.infHazRecords = infHaz; this.tableLoadStatus.infectious_hazardous_waste = 'full'; }
 
           this.invalidateFilterCache();
           this.recalculateAllStats();
-          this.showLoader(false);
-          this.checkAutoDailyRunOnLogin();
           if (this.currentTab === 'dashboard') {
             this.$nextTick(() => {
               setTimeout(() => { this.drawDashboardCharts(); }, 200);
@@ -6247,77 +7346,147 @@
           return comp ? comp.company_name : id;
         },
 
-        // ADVANCED FILTER HELPERS
-        matchDateRange(dateStr) {
+                // ADVANCED FILTER HELPERS
+        matchDateRange(dateStr, rawRow) {
           const hasStart = Boolean(this.filters.startDate && String(this.filters.startDate).trim() !== '');
           const hasEnd = Boolean(this.filters.endDate && String(this.filters.endDate).trim() !== '');
 
           // If no date range filter is set, pass 100% of records
           if (!hasStart && !hasEnd) return true;
 
-          if (!dateStr) return true;
+          const cd = this.cleanDate(dateStr) || (rawRow ? (this.cleanDate(rawRow.created_date) || this.cleanDate(rawRow.waste_date) || this.cleanDate(rawRow.received_date) || this.cleanDate(rawRow.created_at) || this.cleanDate(rawRow.disposal_no)) : null);
+          if (!cd) return false;
 
-          const cd = this.cleanDate(dateStr);
-          if (!cd) return true;
+          const fStart = this.cleanDate(this.filters.startDate);
+          const fEnd = this.cleanDate(this.filters.endDate);
 
-          if (hasStart && cd < this.filters.startDate) return false;
-          if (hasEnd && cd > this.filters.endDate) return false;
+          if (hasStart && fStart && cd < fStart) return false;
+          if (hasEnd && fEnd && cd > fEnd) return false;
 
           return true;
         },
 
         matchCommonFilters(dateStr, yearVal, monthVal, deptVal, rawRow) {
+          const hasStart = Boolean(this.filters.startDate && String(this.filters.startDate).trim() !== '');
+          const hasEnd = Boolean(this.filters.endDate && String(this.filters.endDate).trim() !== '');
+
           // 1. Date Range
-          if (!this.matchDateRange(dateStr)) return false;
+          if (!this.matchDateRange(dateStr, rawRow)) return false;
 
-          // 2. Year filter
-          if (this.filters.year && String(this.filters.year).trim() !== '') {
-            const filterYear = String(this.filters.year).trim();
-            let rowYear = '';
-            if (yearVal) rowYear = String(yearVal).trim();
-            else if (dateStr) {
-              const y = parseInt(String(dateStr).substring(0, 4), 10);
-              if (!isNaN(y)) rowYear = String(y > 2500 ? y : y + 543);
-            }
-            if (!rowYear && rawRow) {
-              const disp = rawRow.disposal_no || rawRow['เลขที่การมารับขยะติดเชื้อ'] || '';
-              const rcvM = String(disp).match(/RCV(\d{2})/i);
-              if (rcvM) rowYear = String(2500 + parseInt(rcvM[1], 10));
-            }
-            if (rowYear && rowYear !== filterYear) return false;
-          }
+          const cd = this.cleanDate(dateStr) || (rawRow ? (this.cleanDate(rawRow.created_date) || this.cleanDate(rawRow.waste_date) || this.cleanDate(rawRow.received_date) || this.cleanDate(rawRow.created_at) || this.cleanDate(rawRow.disposal_no)) : null);
 
-          // 3. Month filter
-          if (this.filters.month && String(this.filters.month).trim() !== '') {
-            const filterMonth = String(this.filters.month).trim();
-            let rowMonth = '';
-            if (monthVal) rowMonth = String(monthVal).trim();
-            else if (dateStr) {
-              const cd = this.cleanDate(dateStr);
-              if (cd) {
-                const m = cd.match(/^\d{4}-(\d{2})/);
-                if (m) {
-                  const mIdx = parseInt(m[1], 10) - 1;
-                  if (mIdx >= 0 && mIdx < 12) rowMonth = this.months[mIdx];
+          // 2. Year filter (Only active if explicit date range is NOT set)
+          if (!hasStart && !hasEnd && this.filters.year && String(this.filters.year).trim() !== '') {
+            const fYearNum = parseInt(String(this.filters.year).trim(), 10);
+            const fYearBE = fYearNum > 2500 ? fYearNum : fYearNum + 543;
+
+            let rowYearBE = null;
+            if (yearVal !== undefined && yearVal !== null && String(yearVal).trim() !== '') {
+              const y = parseInt(String(yearVal).trim(), 10);
+              if (!isNaN(y)) rowYearBE = y > 2500 ? y : y + 543;
+            }
+            if (!rowYearBE && cd) {
+              const y = parseInt(cd.substring(0, 4), 10);
+              if (!isNaN(y)) rowYearBE = y + 543;
+            }
+            if (!rowYearBE && rawRow) {
+              if (rawRow.year) {
+                const y = parseInt(String(rawRow.year).trim(), 10);
+                if (!isNaN(y)) rowYearBE = y > 2500 ? y : y + 543;
+              }
+              if (!rowYearBE) {
+                const disp = rawRow.disposal_no || rawRow['เลขที่การมารับขยะติดเชื้อ'] || '';
+                const rcvM = String(disp).match(/RCV(\d{2})/i);
+                if (rcvM) rowYearBE = 2500 + parseInt(rcvM[1], 10);
+              }
+              if (!rowYearBE && rawRow.created_at) {
+                const cad = this.cleanDate(rawRow.created_at);
+                if (cad) {
+                  const y = parseInt(cad.substring(0, 4), 10);
+                  if (!isNaN(y)) rowYearBE = y + 543;
                 }
               }
             }
-            if (!rowMonth && rawRow) {
-              const disp = rawRow.disposal_no || rawRow['เลขที่การมารับขยะติดเชื้อ'] || '';
-              const rcvM = String(disp).match(/RCV\d{2}(\d{2})/i);
-              if (rcvM) {
-                const mIdx = parseInt(rcvM[1], 10) - 1;
-                if (mIdx >= 0 && mIdx < 12) rowMonth = this.months[mIdx];
+
+            if (rowYearBE !== null && rowYearBE !== fYearBE) {
+              return false;
+            }
+          }
+
+          // 3. Month filter (Only active if explicit date range is NOT set)
+          if (!hasStart && !hasEnd && this.filters.month && String(this.filters.month).trim() !== '') {
+            const fMonthStr = String(this.filters.month).trim();
+            let fMonthIdx = this.months.indexOf(fMonthStr);
+            if (fMonthIdx === -1) {
+              const numM = parseInt(fMonthStr, 10);
+              if (!isNaN(numM) && numM >= 1 && numM <= 12) fMonthIdx = numM - 1;
+            }
+
+            if (fMonthIdx !== -1) {
+              let rowMonthIdx = -1;
+
+              // A. From monthVal
+              if (monthVal !== undefined && monthVal !== null && String(monthVal).trim() !== '') {
+                const mStr = String(monthVal).trim();
+                rowMonthIdx = this.months.indexOf(mStr);
+                if (rowMonthIdx === -1) {
+                  const numM = parseInt(mStr, 10);
+                  if (!isNaN(numM) && numM >= 1 && numM <= 12) rowMonthIdx = numM - 1;
+                }
+              }
+
+              // B. From rawRow.month
+              if (rowMonthIdx === -1 && rawRow && rawRow.month) {
+                const mStr = String(rawRow.month).trim();
+                rowMonthIdx = this.months.indexOf(mStr);
+                if (rowMonthIdx === -1) {
+                  const numM = parseInt(mStr, 10);
+                  if (!isNaN(numM) && numM >= 1 && numM <= 12) rowMonthIdx = numM - 1;
+                }
+              }
+
+              // C. From cleanDate
+              if (rowMonthIdx === -1 && cd) {
+                const mMatch = cd.match(/^\d{4}-(\d{2})/);
+                if (mMatch) rowMonthIdx = parseInt(mMatch[1], 10) - 1;
+              }
+
+              // D. From disposal_no (RCV6907...)
+              if (rowMonthIdx === -1 && rawRow) {
+                const disp = rawRow.disposal_no || rawRow['เลขที่การมารับขยะติดเชื้อ'] || '';
+                const rcvM = String(disp).match(/RCV\d{2}(\d{2})/i);
+                if (rcvM) rowMonthIdx = parseInt(rcvM[1], 10) - 1;
+              }
+
+              // E. From created_at
+              if (rowMonthIdx === -1 && rawRow && rawRow.created_at) {
+                const cad = this.cleanDate(rawRow.created_at);
+                if (cad) {
+                  const mMatch = cad.match(/^\d{4}-(\d{2})/);
+                  if (mMatch) rowMonthIdx = parseInt(mMatch[1], 10) - 1;
+                }
+              }
+
+              if (rowMonthIdx !== -1 && rowMonthIdx !== fMonthIdx) {
+                return false;
               }
             }
-            if (rowMonth && rowMonth !== filterMonth) return false;
           }
 
           // 4. Department filter
-          if (this.filters.departmentId && String(this.filters.departmentId).trim() !== '' && deptVal) {
-            const fDept = String(this.filters.departmentId).trim();
-            if (String(deptVal) !== fDept && this.getDeptName(deptVal) !== this.getDeptName(fDept)) {
-              return false;
+          if (this.filters.departmentId && String(this.filters.departmentId).trim() !== '') {
+            const fDeptId = String(this.filters.departmentId).trim();
+            const fDeptName = this.getDeptName(fDeptId);
+
+            const rowDeptId = deptVal !== undefined && deptVal !== null ? String(deptVal).trim() : (rawRow ? String(rawRow.department_id || rawRow.department_name || rawRow.department || '').trim() : '');
+
+            if (rowDeptId) {
+              const rowDeptName = this.getDeptName(rowDeptId);
+              const isMatch = (rowDeptId === fDeptId) || 
+                              (rowDeptName && fDeptName && rowDeptName === fDeptName) ||
+                              (String(rowDeptId).toLowerCase() === String(fDeptId).toLowerCase()) ||
+                              (rowDeptName && String(rowDeptName).toLowerCase().includes(String(fDeptName).toLowerCase()));
+              if (!isMatch) return false;
             }
           }
 
@@ -6502,15 +7671,32 @@
             this.isFiltering = false;
           }, 300);
         },
+        setGeneralWasteShift(shift) {
+          this.generalWasteShiftFilter = shift;
+          this.invalidateFilterCache();
+          this.recalculateAllStats();
+        },
 
         filteredGeneralWaste() {
-          // Return cache ถ้ายังใช้งานได้
           if (this._filterCache.generalWaste !== null && this._filterCache._version === this._filterVersion) {
             return this._filterCache.generalWaste;
           }
           const list = (this.generalWasteRecords || []).filter(g => {
             const matchCommon = this.matchCommonFilters(g.waste_date, g.year, g.month, g.department_id, g);
             if (!matchCommon) return false;
+
+            // Report Type Filter
+            if (this.filters.reportType && this.filters.reportType !== 'all') {
+              if (this.filters.reportType === 'general') {
+                if (Number(g.general_kg || 0) <= 0) return false;
+              } else if (this.filters.reportType === 'organic') {
+                if (Number(g.organic_kg || 0) <= 0) return false;
+              } else {
+                return false;
+              }
+            }
+
+            // Shift Filter
             if (this.generalWasteShiftFilter && this.generalWasteShiftFilter !== 'all') {
               const s = this.getRecordShift(g);
               if (s !== this.generalWasteShiftFilter) return false;
@@ -6528,10 +7714,18 @@
             return this._filterCache.subdistrictRecords;
           }
           const list = (this.subdistrictRecords || []).filter(s => {
-            return this.matchCommonFilters(s.received_date, s.year, s.month, null, s);
+            const matchCommon = this.matchCommonFilters(s.received_date, s.year, s.month, null, s);
+            if (!matchCommon) return false;
+
+            // Report Type Filter
+            if (this.filters.reportType && this.filters.reportType !== 'all') {
+              if (this.filters.reportType !== 'infectious') return false;
+            }
+            return true;
           });
           const result = this.sortRecordsDesc(list, ['received_date', 'created_at']);
           this._filterCache.subdistrictRecords = result;
+          this._filterCache._version = this._filterVersion;
           return result;
         },
 
@@ -6540,10 +7734,26 @@
             return this._filterCache.infHazRecords;
           }
           const list = (this.infHazRecords || []).filter(h => {
-            return this.matchCommonFilters(h.waste_date, h.year, h.month, null, h);
+            const matchCommon = this.matchCommonFilters(h.waste_date, h.year, h.month, null, h);
+            if (!matchCommon) return false;
+
+            // Report Type Filter
+            if (this.filters.reportType && this.filters.reportType !== 'all') {
+              if (this.filters.reportType === 'infectious') {
+                const infSum = Number(h.sharp_infectious || 0) + Number(h.non_sharp_infectious || 0);
+                if (infSum <= 0) return false;
+              } else if (this.filters.reportType === 'hazardous') {
+                const hazSum = Number(h.chemical_hazard || 0) + Number(h.medical_hazard || 0) + Number(h.household_obg_hazard || 0) + Number(h.radioactive_hazard || 0);
+                if (hazSum <= 0) return false;
+              } else {
+                return false;
+              }
+            }
+            return true;
           });
           const result = this.sortRecordsDesc(list, ['waste_date', 'created_at']);
           this._filterCache.infHazRecords = result;
+          this._filterCache._version = this._filterVersion;
           return result;
         },
 
@@ -6552,10 +7762,18 @@
             return this._filterCache.disposalDetails;
           }
           const list = (this.disposalDetails || []).filter(d => {
-            return this.matchCommonFilters(d.created_date, null, null, null, d);
+            const matchCommon = this.matchCommonFilters(d.created_date, null, null, null, d);
+            if (!matchCommon) return false;
+
+            // Report Type Filter
+            if (this.filters.reportType && this.filters.reportType !== 'all') {
+              if (this.filters.reportType !== 'infectious') return false;
+            }
+            return true;
           });
           const result = this.sortRecordsDesc(list, ['created_date', 'created_at']);
           this._filterCache.disposalDetails = result;
+          this._filterCache._version = this._filterVersion;
           return result;
         },
 
@@ -6565,13 +7783,20 @@
           }
           const list = (this.disposalHistory || []).filter(h => {
             const dateStr = h.created_date || (h.created_at ? String(h.created_at).split('T')[0] : null);
-            return this.matchCommonFilters(dateStr, null, null, null, h);
+            const matchCommon = this.matchCommonFilters(dateStr, null, null, null, h);
+            if (!matchCommon) return false;
+
+            // Report Type Filter
+            if (this.filters.reportType && this.filters.reportType !== 'all') {
+              if (this.filters.reportType !== 'infectious') return false;
+            }
+            return true;
           });
           const result = this.sortRecordsDesc(list, ['created_date', 'created_at']);
           this._filterCache.disposalHistory = result;
+          this._filterCache._version = this._filterVersion;
           return result;
         },
-
         recalculateAllStats() {
           let subdistricts = this.filteredSubdistrictRecords();
           let disposalHist = this.filteredDisposalHistory();
@@ -6785,6 +8010,20 @@
           this.chartTrigger++;
         },
 
+                onDateFilterChange() {
+          if (this.filters.startDate || this.filters.endDate) {
+            this.filters.year = '';
+            this.filters.month = '';
+          }
+          this.applyFilters();
+        },
+
+        onYearOrMonthFilterChange() {
+          this.filters.startDate = '';
+          this.filters.endDate = '';
+          this.applyFilters();
+        },
+
         applyFilters() {
           this.invalidateFilterCache();
           this.recalculateAllStats();
@@ -6796,8 +8035,8 @@
         },
 
         drawDashboardCharts() {
-          Chart.defaults.color = '#94a3b8';
-          Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.08)';
+          Chart.defaults.color = this.theme === 'dark' ? '#94a3b8' : '#475569';
+          Chart.defaults.borderColor = this.theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
 
           // 1. CARBON TREND CHART
           const ctxCarbonTrend = document.getElementById('carbonTrendChart');
@@ -8473,31 +9712,82 @@
             timer: 1800,
             showConfirmButton: false
           });
-          if (this.autoGenSettings.enableAutoDaily) {
-            this.checkAutoDailyRunOnLogin();
-          }
         },
 
-        getDepartmentAutoWeight(deptId, deptName) {
+        getDepartmentAutoWeight(deptId, deptName, targetDateStr) {
           const name = String(deptName || this.getDeptName(deptId) || '').trim();
           
-          // Tier 1: Check historical records in generalWasteRecords (+3% growth)
-          const hist = (this.generalWasteRecords || []).filter(r => 
+          // 1. ตรวจสอบปี พ.ศ. เป้าหมาย
+          let targetYearBE = 2569;
+          if (targetDateStr) {
+            const d = new Date(targetDateStr);
+            if (!isNaN(d.getTime())) {
+              targetYearBE = d.getFullYear() > 2500 ? d.getFullYear() : d.getFullYear() + 543;
+            }
+          }
+
+          // 2. เกณฑ์โมเดลโรงพยาบาล ๕๐ พรรษา มหาวชิราลงกรณ (ขนาด 330 เตียง, อัตราครองเตียง 82%, OPD 1,050 ราย/วัน, จนท. 760 คน)
+          const hospProfile = this.hospitalProfile || {
+            totalBeds: 330,             // 330 เตียง
+            bedOccupancyRate: 0.82,     // อัตราการครองเตียงเฉลี่ย 82% (~270 เตียงครองจริง/วัน)
+            dailyOpdVisits: 1050,       // ผู้ป่วยนอกเฉลี่ย 1,050 ราย/วัน
+            totalStaff: 760,            // บุคลากรและเจ้าหน้าที่ รพ. 760 คน
+            annualGrowthRate: 0.028     // แนวโน้มการเติบโตของปริมาณบริการ ~2.8% ต่อปี
+          };
+
+          // 3. ดึงข้อมูลจริงของทุกปีที่มีในระบบ (All-Year Historical Data Analysis)
+          const allHist = (this.generalWasteRecords || []).filter(r => 
             String(r.department_id) === String(deptId) || 
             String(r.department_id) === String(name) ||
             this.getDeptName(r.department_id) === name
           );
 
-          let baseMean = 3.5;
-          let baseOrg = 0.0;
+          let baseMean = 0;
+          let baseOrg = 0;
 
-          if (hist.length > 0) {
-            const sumGen = hist.reduce((s, r) => s + (Number(r.general_kg) || 0), 0);
-            baseMean = (sumGen / hist.length) * 1.03; // +3% growth
-            const sumOrg = hist.reduce((s, r) => s + (Number(r.organic_kg) || 0), 0);
-            baseOrg = (sumOrg / hist.length) * 1.03; // +3% growth
+          if (allHist.length > 0) {
+            // จัดกลุ่มข้อมูลตามปีเพื่อวิเคราะห์แนวโน้ม YoY Growth Trend จากข้อมูลจริงทุกปี
+            const yearsMap = {};
+            allHist.forEach(r => {
+              const yr = r.year || (r.waste_date ? (new Date(r.waste_date).getFullYear() > 2500 ? new Date(r.waste_date).getFullYear() : new Date(r.waste_date).getFullYear() + 543) : 2567);
+              if (!yearsMap[yr]) yearsMap[yr] = { genTotal: 0, orgTotal: 0, count: 0 };
+              yearsMap[yr].genTotal += Number(r.general_kg || 0);
+              yearsMap[yr].orgTotal += Number(r.organic_kg || 0);
+              yearsMap[yr].count++;
+            });
+
+            const sortedYears = Object.keys(yearsMap).map(Number).sort((a, b) => a - b);
+            const totalCount = allHist.length;
+            const sumGen = allHist.reduce((s, r) => s + (Number(r.general_kg) || 0), 0);
+            const sumOrg = allHist.reduce((s, r) => s + (Number(r.organic_kg) || 0), 0);
+            
+            const allTimeGenAvg = sumGen / totalCount;
+            const allTimeOrgAvg = sumOrg / totalCount;
+
+            // คำนวณอัตราแนวโน้มการเติบโตเฉลี่ยสะสม (Compound Trend Growth Rate)
+            let yearlyTrendRate = hospProfile.annualGrowthRate; // default ~2.8%
+            if (sortedYears.length >= 2) {
+              const firstYr = sortedYears[0];
+              const lastYr = sortedYears[sortedYears.length - 1];
+              const firstAvg = yearsMap[firstYr].genTotal / yearsMap[firstYr].count;
+              const lastAvg = yearsMap[lastYr].genTotal / yearsMap[lastYr].count;
+              const yrDiff = lastYr - firstYr;
+              if (yrDiff > 0 && firstAvg > 0 && lastAvg > 0) {
+                const empiricalRate = Math.pow(lastAvg / firstAvg, 1 / yrDiff) - 1;
+                // ควบคุมอัตราการเติบโตให้อยู่ในเกณฑ์สมจริง (1.5% - 5.0%)
+                yearlyTrendRate = Math.max(0.015, Math.min(0.050, empiricalRate));
+              }
+            }
+
+            // คำนวณพยากรณ์ล่วงหน้าสำหรับปี 2569 และปีถัดไป
+            const latestRecordedYear = sortedYears.length > 0 ? sortedYears[sortedYears.length - 1] : 2568;
+            const yearsAhead = Math.max(0, targetYearBE - latestRecordedYear);
+            const growthFactor = Math.pow(1 + yearlyTrendRate, yearsAhead);
+
+            baseMean = allTimeGenAvg * growthFactor;
+            baseOrg = allTimeOrgAvg * growthFactor;
           } else {
-            // Tier 2: Check baseline map (covers 50 standard departments)
+            // 4. กรณีแผนกใหม่ที่ยังไม่มีประวัติในระบบ ใช้โมเดลพยากรณ์ตามขนาด 330 เตียง, อัตราครองเตียง 82%, OPD 1,050 ราย/วัน
             let matched = false;
             for (const [k, v] of Object.entries(this.deptBaselineMap || {})) {
               if (name.includes(k) || k.includes(name)) {
@@ -8508,36 +9798,50 @@
               }
             }
 
-            // Tier 3: Future Department Intelligent Categorizer Engine (+3% growth)
+            // จำแนกตามประเภทหน่วยงาน รพ. 330 เตียง
             if (!matched) {
               if (name.includes('ICU') || name.includes('วิกฤต') || name.includes('อายุรกรรม') || name.includes('ศัลยกรรม') || name.includes('หอผู้ป่วย') || name.includes('IPD') || name.includes('พิเศษ') || name.includes('กุมาร') || name.includes('สูติ')) {
-                baseMean = (11.5 + Math.random() * 4.5) * 1.03; // ~12 - 16.5 kg
+                // หอผู้ป่วยใน 330 เตียง (เฉลี่ย 28-35 เตียง/วอร์ด ที่อัตราครองเตียง 82%)
+                baseMean = 12.0 + (Math.random() * 4.5); // ~12.0 - 16.5 กก.
+                baseOrg = Math.random() * 1.5;           // ~0.0 - 1.5 กก.
               } else if (name.includes('ผ่าตัด') || name.includes('วิสัญญี') || name.includes('ER') || name.includes('ฉุกเฉิน') || name.includes('ไต') || name.includes('คลอด') || name.includes('ส่องกล้อง') || name.includes('Cath')) {
-                baseMean = (6.0 + Math.random() * 3.2) * 1.03; // ~6.2 - 9.5 kg
+                // แผนกหัตถการและฉุกเฉิน
+                baseMean = 6.5 + (Math.random() * 3.5);  // ~6.5 - 10.0 กก.
               } else if (name.includes('โภชนาการ') || name.includes('ครัว') || name.includes('อาหาร') || name.includes('โรงอาหาร')) {
-                baseMean = (3.6 + Math.random() * 0.8) * 1.03; // ~3.7 - 4.5 kg
-                baseOrg = (12.0 + Math.random() * 2.5) * 1.03;  // ~12.4 - 15.0 kg
+                // โภชนาการ (เตรียมอาหาร 3 มื้อสำหรับ 270 ผู้ป่วยครองเตียง + 760 จนท.) และโรงอาหาร
+                baseMean = 4.0 + (Math.random() * 2.0);  // ~4.0 - 6.0 กก.
+                baseOrg = 14.0 + (Math.random() * 5.0);  // ~14.0 - 19.0 กก. (ขยะอินทรีย์/เศษอาหาร)
               } else if (name.includes('ซ่อมบำรุง') || name.includes('อาคาร') || name.includes('ยานพาหนะ') || name.includes('ซักรีด') || name.includes('ซักฟอก')) {
-                baseMean = (8.0 + Math.random() * 2.5) * 1.03; // ~8.2 - 10.8 kg
+                // สนับสนุนบริการ ซักรีดผ้า 330 เตียง และอาคารสถานที่
+                baseMean = 8.5 + (Math.random() * 2.5);  // ~8.5 - 11.0 กก.
               } else if (name.includes('LAB') || name.includes('แล็บ') || name.includes('แลบ') || name.includes('ชันสูตร') || name.includes('ยา') || name.includes('เภสัช') || name.includes('X-Ray') || name.includes('รังสี') || name.includes('CT')) {
-                baseMean = (3.5 + Math.random() * 4.5) * 1.03; // ~3.6 - 8.2 kg
+                // ชันสูตร เภสัชกรรม และรังสีวิทยา
+                baseMean = 4.0 + (Math.random() * 4.2);  // ~4.0 - 8.2 กก.
               } else if (name.includes('OPD') || name.includes('ตรวจ') || name.includes('คลินิก') || name.includes('ทันตกรรม') || name.includes('กายภาพ') || name.includes('จิตเวช') || name.includes('เวชกรรม') || name.includes('บริการ')) {
-                baseMean = (2.0 + Math.random() * 2.0) * 1.03; // ~2.1 - 4.1 kg
+                // คลินิกผู้ป่วยนอก (สถิติ 1,050 ราย/วัน กระจายตามคลินิกเฉพาะทาง)
+                baseMean = 2.2 + (Math.random() * 2.0);  // ~2.2 - 4.2 กก.
               } else if (name.includes('ธุรการ') || name.includes('บริหาร') || name.includes('การเงิน') || name.includes('ประกัน') || name.includes('องค์กร') || name.includes('พรส') || name.includes('สารสนเทศ')) {
-                baseMean = (1.0 + Math.random() * 1.5) * 1.03; // ~1.0 - 2.6 kg
+                // งานบริหารและสำนักงาน (บุคลากร 760 คน)
+                baseMean = 1.2 + (Math.random() * 1.8);  // ~1.2 - 3.0 กก.
               } else {
-                baseMean = (2.5 + Math.random() * 1.5) * 1.03; // default fallback ~2.6 - 4.1 kg
+                baseMean = 2.8 + (Math.random() * 1.5);  // ค่าเฉลี่ยสำรองทั่วไป ~2.8 - 4.3 กก.
               }
             }
+
+            // คำนวณแนวโน้มสำหรับปี 2569 และปีถัดไปจากปีฐาน 2568
+            const yearsAhead = Math.max(0, targetYearBE - 2568);
+            const growthFactor = Math.pow(1 + hospProfile.annualGrowthRate, yearsAhead);
+            baseMean = baseMean * growthFactor;
+            if (baseOrg > 0) baseOrg = baseOrg * growthFactor;
           }
 
           if (baseMean <= 0) baseMean = 2.0;
 
-          // Natural realistic random variation (±12%)
-          const factor = 0.88 + (Math.random() * 0.24); // 0.88 - 1.12
-          let genKg = baseMean * factor;
+          // 5. เพิ่มการกระจายตัวแบบสุ่มธรรมชาติ (Natural Daily Jitter ±10% ถึง ±12%)
+          const jitter = 0.90 + (Math.random() * 0.20); // 0.90 - 1.10
+          let genKg = baseMean * jitter;
 
-          // Decimal rounding for maximum realism
+          // จัดรูปแบบทศนิยมให้สมจริง
           if (genKg < 1.0) {
             genKg = Math.max(0.1, Number(genKg.toFixed(1)));
           } else if (genKg < 10.0) {
@@ -8580,7 +9884,7 @@
           const yrBE = String((dateObj.getFullYear() > 2500 ? dateObj.getFullYear() : dateObj.getFullYear() + 543));
           const moName = this.months[dateObj.getMonth()];
 
-          // Dynamically use all departments from refDepartments (supporting 50+ departments and future expansions)
+          // ใช้รายชื่อแผนกทั้งหมดจาก refDepartments (รองรับ 50 แผนกและการเพิ่มแผนกในอนาคต)
           const depts = (this.refDepartments && this.refDepartments.length > 0) 
             ? this.refDepartments 
             : Object.keys(this.deptBaselineMap).map(k => ({ id: k, department_name: k }));
@@ -8592,7 +9896,7 @@
           depts.forEach((dept, idx) => {
             const deptId = dept.id || dept.department_name;
             const deptName = dept.department_name;
-            const dailyWeights = this.getDepartmentAutoWeight(deptId, deptName);
+            const dailyWeights = this.getDepartmentAutoWeight(deptId, deptName, dateClean);
             const staff = this.getDepartmentAutoStaff(deptId, deptName);
 
             activeShifts.forEach(shift => {
@@ -8612,9 +9916,9 @@
                   shiftOrganic = dailyWeights.organic_kg > 0 ? Number((dailyWeights.organic_kg * aRatio).toFixed(1)) : 0;
                 }
               } else {
-                // Split baseline across 2 shifts with Morning having notably higher weight than Afternoon:
-                // Morning (08.00-12.00): ~60% - 68% of daily baseline (mean ~64%)
-                // Afternoon (13.00-16.00): ~32% - 40% of daily baseline (mean ~36%)
+                // แบ่งน้ำหนักขยะออกเป็น 2 รอบตามความเป็นจริงของ รพ. 330 เตียง:
+                // รอบเช้า (08:00-12:00 น.): ~60% - 68% (เฉลี่ย ~64%) รวมขยะสะสมกลางคืน + ตรวจ OPD เช้า + เตรียมอาหาร
+                // รอบบ่าย (13:00-16:00 น.): ~32% - 40% (เฉลี่ย ~36%) ขยะคลินิกบ่าย + เคลียร์ถาดอาหารกลางวัน + ราวด์บ่าย
                 if (shift === 'morning') {
                   const mRatio = 0.60 + (Math.random() * 0.08); // 0.60 - 0.68
                   shiftGeneral = Number((dailyWeights.general_kg * mRatio).toFixed(1));
@@ -8629,13 +9933,13 @@
               if (shiftGeneral < 0.1 && dailyWeights.general_kg > 0) shiftGeneral = 0.1;
 
               if (shift === 'morning') {
-                // Morning Shift: 08:15 - 11:45 น.
+                // รอบเช้า: 08:15 - 11:45 น.
                 const mHour = 8 + Math.floor(Math.random() * 4); // 8, 9, 10, 11
                 const mMin = Math.floor(Math.random() * 55) + 5;
                 timeStr = `${String(mHour).padStart(2, '0')}:${String(mMin).padStart(2, '0')}:00`;
                 idSuffix = 'M';
               } else {
-                // Afternoon Shift: 13:15 - 15:45 น.
+                // รอบบ่าย: 13:15 - 15:45 น.
                 const aHour = 13 + Math.floor(Math.random() * 3); // 13, 14, 15
                 const aMin = Math.floor(Math.random() * 55) + 5;
                 timeStr = `${String(aHour).padStart(2, '0')}:${String(aMin).padStart(2, '0')}:00`;
@@ -8783,18 +10087,8 @@
         },
 
         async checkAutoDailyRunOnLogin() {
-          if (!this.autoGenSettings.enableAutoDaily) return;
-          const missing = this.getMissingPastDaysList();
-          if (missing.length > 0 && this.refDepartments && this.refDepartments.length > 0) {
-            console.log(`Auto Daily Run: Found ${missing.length} missing past days. Auto-generating records...`);
-            const allMissingRows = [];
-            for (const dIso of missing) {
-              const dayRows = this.generateRecordsForDate(dIso, 'both');
-              allMissingRows.push(...dayRows);
-            }
-            this.autoGenPreviewRows = allMissingRows;
-            await this.executeAutoGenSave();
-          }
+          // ปิดการบันทึกอัตโนมัติเองเมื่อเปิดหน้าเว็บตามคำขอของผู้ใช้ (จะบันทึกเฉพาะเมื่อผู้ใช้กดปุ่มบันทึกข้อมูลอัตโนมัติทุกแผนกเท่านั้น)
+          return;
         },
 
         openAutoGenSettingsModal() {
