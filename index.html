@@ -1523,6 +1523,14 @@
                   <span>⚡ บันทึกข้อมูลอัตโนมัติทุกแผนก</span>
                 </button>
 
+                <!-- Button: Balance Organic Waste (Morning/Afternoon) -->
+                <button type="button" @click="balanceOrganicWasteForRecords()" 
+                        class="px-3.5 py-2 bg-emerald-900/60 hover:bg-emerald-800/80 text-emerald-200 hover:text-white border border-emerald-700/60 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm active:scale-[0.98]"
+                        title="ปรับเกลี่ยขยะอินทรีย์ให้ทุกหน่วยงาน (ทั้งรอบเช้าและบ่าย) สำหรับรายการที่ยังเป็น 0.00 กก.">
+                  <i class="fa-solid fa-leaf text-emerald-400"></i>
+                  <span>🌿 ปรับเกลี่ยขยะอินทรีย์ (เช้า-บ่าย)</span>
+                </button>
+
                 <!-- Button: Open Auto-Gen Settings Modal -->
                 <button type="button" @click="openAutoGenSettingsModal()" 
                         class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-sm active:scale-[0.98]"
@@ -1565,14 +1573,14 @@
                   <span>รอบเวลาบันทึก</span>
                   <span class="text-[10px] text-slate-400 font-normal">วันละ 2 รอบ</span>
                 </label>
-                <select x-model="genWasteForm.shift" @change="genWasteForm.recorded_time = genWasteForm.shift === 'morning' ? '09:30' : '14:00'" class="w-full text-xs bg-slate-950/80 border border-amber-800/60 rounded-xl px-3 py-2.5 text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium">
+                <select x-model="genWasteForm.shift" @change="genWasteForm.recorded_time = genWasteForm.shift === 'morning' ? '09:30' : '14:00'; onGenWasteDeptSelected();" class="w-full text-xs bg-slate-950/80 border border-amber-800/60 rounded-xl px-3 py-2.5 text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-500 font-medium">
                   <option value="morning">☀️ รอบเช้า (08.00 - 12.00 น.)</option>
                   <option value="afternoon">🌤️ รอบบ่าย (13.00 - 16.00 น.)</option>
                 </select>
               </div>
               <div class="sm:col-span-2 md:col-span-2">
                 <label class="block text-[11px] sm:text-xs font-semibold text-slate-400 mb-1.5">แผนก/หน่วยงาน</label>
-                <select x-model="genWasteForm.department_id" class="w-full text-xs bg-slate-950/80 border border-slate-700/80 rounded-xl px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <select x-model="genWasteForm.department_id" @change="onGenWasteDeptSelected()" class="w-full text-xs bg-slate-950/80 border border-slate-700/80 rounded-xl px-3 py-2.5 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
                   <option value="">-- กรุณาเลือกแผนก --</option>
                   <template x-for="dept in refDepartments">
                     <option :value="dept.id" x-text="dept.department_name"></option>
@@ -4625,7 +4633,7 @@
               <span>เพิ่ม / ปรับแต่งเกณฑ์สำหรับแผนกในอนาคต</span>
             </span>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+          <div class="grid grid-cols-1 sm:grid-cols-5 gap-2">
             <div class="sm:col-span-2">
               <input type="text" x-model="newDeptBaselineForm.name" placeholder="ชื่อแผนก/หน่วยงานใหม่..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-[11px] text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-amber-500">
             </div>
@@ -4633,13 +4641,20 @@
               <input type="number" step="0.1" x-model.number="newDeptBaselineForm.mean" placeholder="ทั่วไป (กก.)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-[11px] text-amber-300 placeholder-slate-600 text-right focus:outline-none focus:ring-1 focus:ring-amber-500">
             </div>
             <div>
+              <input type="number" step="0.1" x-model.number="newDeptBaselineForm.organic" placeholder="อินทรีย์ (กก.)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-[11px] text-emerald-400 placeholder-slate-600 text-right focus:outline-none focus:ring-1 focus:ring-emerald-500">
+            </div>
+            <div>
               <input type="text" x-model="newDeptBaselineForm.staff" placeholder="ชื่อผู้บันทึก" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-[11px] text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-amber-500">
             </div>
           </div>
-          <div class="flex justify-end pt-1">
+          <div class="flex items-center justify-between pt-1 flex-wrap gap-2">
+            <button type="button" @click="resetDeptBaselinesToDefault()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl font-medium transition flex items-center gap-1 text-[11px] border border-slate-700 shadow-sm" title="คืนค่าเกณฑ์ขยะอินทรีย์ทุกแผนกให้เป็นค่าเฉลี่ยมาตรฐาน">
+              <i class="fa-solid fa-rotate-left text-slate-400"></i>
+              <span>รีเซ็ตเกณฑ์ขยะอินทรีย์ทุกแผนกเป็นค่ามาตรฐาน</span>
+            </button>
             <button type="button" @click="
               if (!newDeptBaselineForm.name) { Swal.fire('คำแนะนำ', 'กรุณาระบุชื่อแผนก', 'warning'); return; }
-              deptBaselineMap[newDeptBaselineForm.name] = { mean: Number(newDeptBaselineForm.mean) || 3.5, organic: Number(newDeptBaselineForm.organic) || 0.0, staff: newDeptBaselineForm.staff || 'แสงตะวัน ชาวเขา' };
+              deptBaselineMap[newDeptBaselineForm.name] = { mean: Number(newDeptBaselineForm.mean) || 3.5, organic: Number(newDeptBaselineForm.organic) || 0.5, staff: newDeptBaselineForm.staff || 'แสงตะวัน ชาวเขา' };
               localStorage.setItem('custom_dept_baselines', JSON.stringify(deptBaselineMap));
               Swal.fire({ title: 'บันทึกเกณฑ์สำเร็จ', text: `บันทึกเกณฑ์สำหรับ ${newDeptBaselineForm.name} เรียบร้อยแล้ว`, icon: 'success', timer: 1500, showConfirmButton: false });
               newDeptBaselineForm.name = '';
@@ -4665,7 +4680,7 @@
                 <tr class="hover:bg-slate-900/50 transition">
                   <td class="p-2 font-semibold text-slate-200" x-text="dept.department_name"></td>
                   <td class="p-2 text-right font-bold text-amber-400" x-text="`${(deptBaselineMap[dept.department_name]?.mean || 3.5).toFixed(2)} กก.`"></td>
-                  <td class="p-2 text-right text-slate-400" x-text="deptBaselineMap[dept.department_name]?.organic > 0 ? `${deptBaselineMap[dept.department_name].organic.toFixed(2)} กก.` : '-'"></td>
+                  <td class="p-2 text-right font-semibold text-emerald-400" x-text="`${(deptBaselineMap[dept.department_name]?.organic || 0.5).toFixed(2)} กก.`"></td>
                   <td class="p-2 text-slate-300 text-[10px]" x-text="deptBaselineMap[dept.department_name]?.staff || 'แสงตะวัน ชาวเขา'"></td>
                 </tr>
               </template>
@@ -5193,13 +5208,15 @@
           mode: 'stacked'   // 'stacked' (แท่งซ้อน), 'grouped' (แท่งคู่)
         },
         // ข้อมูลเกณฑ์โมเดลโรงพยาบาล ๕๐ พรรษา มหาวชิราลงกรณ (ขนาด 330 เตียง)
+        // สถิติน้ำหนักขยะทั่วไปปี 2569 เฉลี่ยเดือนละ 22,000 - 26,000 กก. (~794 กก./วัน)
+        // แนวโน้มการเกิดขยะเพิ่มขึ้นร้อยละ 3 (0.030) ในปี 2569 และ 2570
         hospitalProfile: {
           totalBeds: 330,             // ขนาด 330 เตียง
           bedOccupancyRate: 0.82,     // อัตราการครองเตียงเฉลี่ย 82% (~270 เตียงครองจริง/วัน)
           dailyOpdVisits: 1050,       // จำนวนผู้รับบริการผู้ป่วยนอกเฉลี่ย 1,050 ราย/วัน
           totalStaff: 760,            // บุคลากรและเจ้าหน้าที่ รพ. 760 คน
           baseYear: 2568,             // ปีฐานข้อมูล
-          annualGrowthRate: 0.028     // แนวโน้มการเติบโตของปริมาณบริการ ~2.8% ต่อปี
+          annualGrowthRate: 0.030     // แนวโน้มการเติบโตของปริมาณขยะเพิ่มขึ้นร้อยละ 3 ในปี 69 และ 70
         },
         deptBaselineSearch: '',
         newDeptBaselineForm: {
@@ -5209,93 +5226,111 @@
           staff: 'แสงตะวัน ชาวเขา'
         },
 
+        // เกณฑ์เฉลี่ยรายแผนก 50 แผนก สำหรับปี 2569 รวมขยะทั่วไป ~793.7 กก./วัน (เดือนละ 22,000 - 26,000 กก.) และขยะอินทรีย์ ~273.7 กก./วัน
+        // แผนกใหญ่ (IPD วอร์ดใหญ่, ผ่าตัด, ER, ICU, ยา, ธุรการ, ซ่อมบำรุง) มีน้ำหนักสูง แผนกเล็กมีน้ำหนักลดหลั่นตามขนาดและภาระงานจริง
         deptBaselineMap: {
-          // --- Inpatient & Critical Wards (หอผู้ป่วยและวิกฤต - 2567/2568 baseline +3% growth) ---
-          'กุมารเวชกรรม': { mean: 7.47, organic: 0.0, staff: 'พรรณี ขลุ่ยทอง' },
-          'กุมารเวชกรรม ชั้น 7': { mean: 7.47, organic: 0.0, staff: 'พรรณี ขลุ่ยทอง' },
-          'อายุรกรรมรวม': { mean: 12.88, organic: 0.0, staff: 'อรทัย เนืองพงษ์' },
-          'อายุรกรรมรวม ชั้น 8': { mean: 12.88, organic: 0.0, staff: 'อรทัย เนืองพงษ์' },
-          'อายุกรรมชาย ชั้น 3': { mean: 15.45, organic: 0.0, staff: 'ฐิตาภรณ์ พันธ์คำ' },
-          'อายุรกรรมชาย': { mean: 15.45, organic: 0.0, staff: 'ฐิตาภรณ์ พันธ์คำ' },
-          'อายุกรรมหญิง ชั้น 2': { mean: 16.48, organic: 0.0, staff: 'เดือนเพ็ญ แก่นสายศ' },
-          'อายุรกรรมหญิง': { mean: 16.48, organic: 0.0, staff: 'เดือนเพ็ญ แก่นสายศ' },
-          'ศัลยกรรม': { mean: 9.48, organic: 0.0, staff: 'ปราณี คงดี' },
-          'ศัลยกรรม ชั้น 6': { mean: 9.48, organic: 0.0, staff: 'ปราณี คงดี' },
-          'ICU เมด': { mean: 8.24, organic: 0.0, staff: 'นงรัก รินริโก' },
-          'ICU อายุกรรม ชั้น 4': { mean: 8.24, organic: 0.0, staff: 'นงรัก รินริโก' },
-          'ICU ศัลยกรรม ชั้น 4': { mean: 8.24, organic: 0.0, staff: 'นงรัก รินริโก' },
-          'พิเศษ7': { mean: 5.15, organic: 0.0, staff: 'อุไร บุญสวัสดิ์' },
-          'หอผู้ป่วยในพิเศษ VIP7 ชั้น 7': { mean: 5.15, organic: 0.0, staff: 'อุไร บุญสวัสดิ์' },
-          'พิเศษ8': { mean: 8.24, organic: 0.0, staff: 'อภัสณันท์ อบแก้ว' },
-          'หอผู้ป่วยในพิเศษ VIP8 ชั้น 8': { mean: 8.24, organic: 0.0, staff: 'อภัสณันท์ อบแก้ว' },
-          'พิเศษตึกพรหม': { mean: 5.15, organic: 0.0, staff: 'พรหมพร แวดล้อม' },
-          'สงฆ์อาพาธ ตึกพรหม': { mean: 5.15, organic: 0.0, staff: 'พรหมพร แวดล้อม' },
-          'จุดตึกพรหม': { mean: 2.06, organic: 0.0, staff: 'ปวีณา ลาสา' },
+          // --- Inpatient Wards (หอผู้ป่วยใน - ผู้ป่วยใน 330 เตียง ขยะทั่วไป 18-53 กก./วัน, ขยะอินทรีย์ 5-15 กก./วัน) ---
+          'อายุกรรมหญิง ชั้น 2': { mean: 51.0, organic: 14.0, staff: 'เดือนเพ็ญ แก่นสายศ' },
+          'อายุรกรรมหญิง': { mean: 51.0, organic: 14.0, staff: 'เดือนเพ็ญ แก่นสายศ' },
+          'อายุกรรมชาย ชั้น 3': { mean: 49.0, organic: 13.5, staff: 'ฐิตาภรณ์ พันธ์คำ' },
+          'อายุรกรรมชาย': { mean: 49.0, organic: 13.5, staff: 'ฐิตาภรณ์ พันธ์คำ' },
+          'อายุรกรรมรวม ชั้น 8': { mean: 42.0, organic: 11.5, staff: 'อรทัย เนืองพงษ์' },
+          'อายุรกรรมรวม': { mean: 42.0, organic: 11.5, staff: 'อรทัย เนืองพงษ์' },
+          'ศัลยกรรม ชั้น 6': { mean: 33.5, organic: 9.5, staff: 'ปราณี คงดี' },
+          'ศัลยกรรม': { mean: 33.5, organic: 9.5, staff: 'ปราณี คงดี' },
+          'ออโถปิดิกส์ ชั้น 5': { mean: 29.0, organic: 8.0, staff: 'ไพรจิตร สิทธิ' },
+          'ออโตปิดิกส์': { mean: 29.0, organic: 8.0, staff: 'ไพรจิตร สิทธิ' },
+          'ออโถปิดิกส์': { mean: 29.0, organic: 8.0, staff: 'ไพรจิตร สิทธิ' },
+          'กุมารเวชกรรม ชั้น 7': { mean: 25.0, organic: 8.0, staff: 'พรรณี ขลุ่ยทอง' },
+          'กุมารเวชกรรม': { mean: 25.0, organic: 8.0, staff: 'พรรณี ขลุ่ยทอง' },
+          'หอผู้ป่วยในพิเศษ VIP8 ชั้น 8': { mean: 24.0, organic: 7.0, staff: 'อภัสณันท์ อบแก้ว' },
+          'พิเศษ8': { mean: 24.0, organic: 7.0, staff: 'อภัสณันท์ อบแก้ว' },
+          'หอผู้ป่วยในพิเศษ VIP7 ชั้น 7': { mean: 19.5, organic: 6.0, staff: 'อุไร บุญสวัสดิ์' },
+          'พิเศษ7': { mean: 19.5, organic: 6.0, staff: 'อุไร บุญสวัสดิ์' },
+          'สงฆ์อาพาธ ตึกพรหม': { mean: 18.0, organic: 5.2, staff: 'พรหมพร แวดล้อม' },
+          'สงฆ์อาพาธ': { mean: 18.0, organic: 5.2, staff: 'พรหมพร แวดล้อม' },
+          'พิเศษตึกพรหม': { mean: 18.0, organic: 5.2, staff: 'พรหมพร แวดล้อม' },
 
-          // --- Surgical, Critical & Procedure Units (ผ่าตัด ฉุกเฉิน หัตถการ) ---
-          'ห้องผ่าตัด': { mean: 9.27, organic: 0.0, staff: 'ตินนา นันทะวงศ์' },
-          'ผ่าตัด วิสัญญี ชั้น 5': { mean: 9.27, organic: 0.0, staff: 'ตินนา นันทะวงศ์' },
-          'ER': { mean: 3.61, organic: 0.0, staff: 'อริริษา อารีรมย์' },
-          'อุบัติเหตุฉุกเฉิน ER': { mean: 3.61, organic: 0.0, staff: 'อริริษา อารีรมย์' },
-          'จุดรวมข้าง ER': { mean: 2.06, organic: 0.0, staff: 'ปวีณา ลาสา' },
-          'ห้องคลอด': { mean: 3.71, organic: 0.0, staff: 'ไพรจิตร สิทธิ' },
-          'ห้องคลอด สูตินารีเวช ชั้น 4': { mean: 3.71, organic: 0.0, staff: 'ไพรจิตร สิทธิ' },
-          'ออโตปิดิกส์': { mean: 8.34, organic: 0.0, staff: 'ไพรจิตร สิทธิ' },
-          'ออโถปิดิกส์ ชั้น 5': { mean: 8.34, organic: 0.0, staff: 'ไพรจิตร สิทธิ' },
-          'ไตเทียม': { mean: 8.24, organic: 0.0, staff: 'บัวลี แสงสว่าง' },
-          'ไตเทียม ชั้น 3': { mean: 8.24, organic: 0.0, staff: 'บัวลี แสงสว่าง' },
-          'ล้างไตในช่องท้อง CAPD ชั้น 2': { mean: 3.09, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' },
-          'จักษุ': { mean: 7.42, organic: 0.0, staff: 'ปราณี คงดี' },
-          'จักษุ โสต ศอ นาสิก ชั้น 6': { mean: 7.42, organic: 0.0, staff: 'ปราณี คงดี' },
+          // --- Surgical, Critical & Procedure Units (หัตถการ ผ่าตัด วิกฤต ฉุกเฉิน) ---
+          'ผ่าตัด วิสัญญี ชั้น 5': { mean: 29.5, organic: 4.2, staff: 'ตินนา นันทะวงศ์' },
+          'ห้องผ่าตัด': { mean: 29.5, organic: 4.2, staff: 'ตินนา นันทะวงศ์' },
+          'วิสัญญี': { mean: 29.5, organic: 4.2, staff: 'ตินนา นันทะวงศ์' },
+          'ไตเทียม ชั้น 3': { mean: 25.0, organic: 4.5, staff: 'บัวลี แสงสว่าง' },
+          'ไตเทียม': { mean: 25.0, organic: 4.5, staff: 'บัวลี แสงสว่าง' },
+          'ICU อายุกรรม ชั้น 4': { mean: 23.5, organic: 5.0, staff: 'นงรัก รินริโก' },
+          'ICU อายุกรรม': { mean: 23.5, organic: 5.0, staff: 'นงรัก รินริโก' },
+          'ICU เมด': { mean: 23.5, organic: 5.0, staff: 'นงรัก รินริโก' },
+          'ICU ศัลยกรรม ชั้น 4': { mean: 23.5, organic: 5.0, staff: 'นงรัก รินริโก' },
+          'ICU ศัลยกรรม': { mean: 23.5, organic: 5.0, staff: 'นงรัก รินริโก' },
+          'จักษุ โสต ศอ นาสิก ชั้น 6': { mean: 23.0, organic: 6.0, staff: 'ปราณี คงดี' },
+          'จักษุ': { mean: 23.0, organic: 6.0, staff: 'ปราณี คงดี' },
+          'อุบัติเหตุฉุกเฉิน ER': { mean: 19.5, organic: 4.0, staff: 'อริริษา อารีรมย์' },
+          'ER': { mean: 19.5, organic: 4.0, staff: 'อริริษา อารีรมย์' },
+          'อุบัติเหตุฉุกเฉิน': { mean: 19.5, organic: 4.0, staff: 'อริริษา อารีรมย์' },
+          'ห้องคลอด สูตินารีเวช ชั้น 4': { mean: 13.5, organic: 3.8, staff: 'ไพรจิตร สิทธิ' },
+          'ห้องคลอด': { mean: 13.5, organic: 3.8, staff: 'ไพรจิตร สิทธิ' },
+          'ล้างไตในช่องท้อง CAPD ชั้น 2': { mean: 9.5, organic: 2.4, staff: 'ประไพพิศ อารีรมย์' },
 
           // --- Diagnostics, Pharmacy & Labs (ชันสูตร ยา รังสี) ---
-          'ห้องยา': { mean: 8.24, organic: 0.0, staff: 'ฐิตาภรณ์ พันธ์คำ' },
-          'ห้องจ่ายยา ชั้น 1': { mean: 8.24, organic: 0.0, staff: 'ฐิตาภรณ์ พันธ์คำ' },
-          'คลังยา อาคารเภสัช': { mean: 1.55, organic: 0.0, staff: 'นันทนา ทวีวงศ์' },
-          'คลังยาเภสัช': { mean: 1.55, organic: 0.0, staff: 'นันทนา ทวีวงศ์' },
-          'ห้อง LAB ชั้น 1': { mean: 3.86, organic: 0.0, staff: 'นารอน สุวรรณา' },
-          'ห้องแลบ': { mean: 3.86, organic: 0.0, staff: 'นารอน สุวรรณา' },
-          'ห้อง X-RAY ชั้น 1': { mean: 2.06, organic: 0.0, staff: 'คมคาย ศรีเนตร' },
-          'X-Ray ชั้น 1': { mean: 2.06, organic: 0.0, staff: 'คมคาย ศรีเนตร' },
-          'CT SCAN ชั้น 1': { mean: 2.06, organic: 0.0, staff: 'คมคาย ศรีเนตร' },
+          'ห้องจ่ายยา ชั้น 1': { mean: 26.0, organic: 3.2, staff: 'ฐิตาภรณ์ พันธ์คำ' },
+          'ห้องยา': { mean: 26.0, organic: 3.2, staff: 'ฐิตาภรณ์ พันธ์คำ' },
+          'ห้อง LAB ชั้น 1': { mean: 13.0, organic: 2.4, staff: 'นารอน สุวรรณา' },
+          'ห้องแลบ': { mean: 13.0, organic: 2.4, staff: 'นารอน สุวรรณา' },
+          'คลังยา อาคารเภสัช': { mean: 6.8, organic: 1.4, staff: 'นันทนา ทวีวงศ์' },
+          'คลังยาเภสัช': { mean: 6.8, organic: 1.4, staff: 'นันทนา ทวีวงศ์' },
+          'คลังยา': { mean: 6.8, organic: 1.4, staff: 'นันทนา ทวีวงศ์' },
+          'ห้อง X-RAY ชั้น 1': { mean: 6.8, organic: 1.5, staff: 'คมคาย ศรีเนตร' },
+          'X-Ray ชั้น 1': { mean: 6.8, organic: 1.5, staff: 'คมคาย ศรีเนตร' },
+          'X-RAY': { mean: 6.8, organic: 1.5, staff: 'คมคาย ศรีเนตร' },
+          'CT SCAN ชั้น 1': { mean: 6.8, organic: 1.5, staff: 'คมคาย ศรีเนตร' },
+          'CT SCAN': { mean: 6.8, organic: 1.5, staff: 'คมคาย ศรีเนตร' },
 
-          // --- Outpatient & Specialized Clinics (OPD และคลินิกเฉพาะทาง) ---
-          'OPD GP ทั่วไป ชั้น1': { mean: 2.06, organic: 0.0, staff: 'คมคาย ศรีเนตร' },
-          'เภสัชกรรม,ห้องน้ำ opd gp ห้องเอ็กเรย์ ,ct scan': { mean: 2.06, organic: 0.0, staff: 'คมคาย ศรีเนตร' },
-          'OPD เฉพาะทาง ชั้น 3': { mean: 3.61, organic: 0.0, staff: 'วรรณา สดใส' },
-          'OPD NCD เฉพาะทาง ชั้น 1': { mean: 2.58, organic: 0.0, staff: 'วรรณา สดใส' },
-          'OPD อายุรกรรมเด็ก ชั้น 3': { mean: 2.06, organic: 0.0, staff: 'บัวลี แสงสว่าง' },
-          'opd เด็ก': { mean: 2.06, organic: 0.0, staff: 'บัวลี แสงสว่าง' },
-          'ทันตกรรม': { mean: 3.09, organic: 0.0, staff: 'บัวลี แสงสว่าง' },
-          'ทันตกรรม ชั้น 2': { mean: 3.09, organic: 0.0, staff: 'บัวลี แสงสว่าง' },
-          'กายภาพบำบัด ชั้น 9': { mean: 1.03, organic: 0.0, staff: 'สิริพร พรมดี' },
-          'เวชกรรมสังคม ชั้น 9': { mean: 1.55, organic: 0.0, staff: 'กัญญารัตน์ ชัยศรี' },
-          'คลินิกบริการ': { mean: 2.06, organic: 0.0, staff: 'วรรณา สดใส' },
-          'คลินิคตรวจสุขภาพ อาชีวเวชกรรม ชั้น 4': { mean: 2.06, organic: 0.0, staff: 'วรรณา สดใส' },
-          'งานจิตเวช ชั้น 2': { mean: 2.06, organic: 0.0, staff: 'วิภาดา มณีจันทร์' },
-          'แพทย์แผนไทย,แพทย์แผนจีน,สปาร์ ชั้น 4': { mean: 0.31, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' },
-          'สปาร์': { mean: 0.31, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' },
+          // --- Outpatient & Specialized Clinics (OPD และคลินิกเฉพาะทาง 1,050 ราย/วัน) ---
+          'OPD เฉพาะทาง ชั้น 3': { mean: 12.5, organic: 3.0, staff: 'วรรณา สดใส' },
+          'OPD เฉพาะทาง': { mean: 12.5, organic: 3.0, staff: 'วรรณา สดใส' },
+          'OPD GP ทั่วไป ชั้น1': { mean: 10.5, organic: 2.6, staff: 'คมคาย ศรีเนตร' },
+          'OPD GP': { mean: 10.5, organic: 2.6, staff: 'คมคาย ศรีเนตร' },
+          'เภสัชกรรม,ห้องน้ำ opd gp ห้องเอ็กเรย์ ,ct scan': { mean: 10.5, organic: 2.6, staff: 'คมคาย ศรีเนตร' },
+          'OPD NCD เฉพาะทาง ชั้น 1': { mean: 10.5, organic: 2.6, staff: 'วรรณา สดใส' },
+          'OPD NCD': { mean: 10.5, organic: 2.6, staff: 'วรรณา สดใส' },
+          'ทันตกรรม ชั้น 2': { mean: 10.5, organic: 2.4, staff: 'บัวลี แสงสว่าง' },
+          'ทันตกรรม': { mean: 10.5, organic: 2.4, staff: 'บัวลี แสงสว่าง' },
+          'OPD อายุรกรรมเด็ก ชั้น 3': { mean: 8.5, organic: 2.2, staff: 'บัวลี แสงสว่าง' },
+          'opd เด็ก': { mean: 8.5, organic: 2.2, staff: 'บัวลี แสงสว่าง' },
+          'คลินิกบริการ': { mean: 6.8, organic: 1.8, staff: 'วรรณา สดใส' },
+          'คลินิคตรวจสุขภาพ อาชีวเวชกรรม ชั้น 4': { mean: 6.8, organic: 1.8, staff: 'วรรณา สดใส' },
+          'งานจิตเวช ชั้น 2': { mean: 6.8, organic: 1.8, staff: 'วิภาดา มณีจันทร์' },
+          'งานจิตเวช': { mean: 6.8, organic: 1.8, staff: 'วิภาดา มณีจันทร์' },
+          'เวชกรรมสังคม ชั้น 9': { mean: 5.5, organic: 1.4, staff: 'กัญญารัตน์ ชัยศรี' },
+          'เวชกรรมสังคม': { mean: 5.5, organic: 1.4, staff: 'กัญญารัตน์ ชัยศรี' },
+          'กายภาพบำบัด ชั้น 9': { mean: 3.8, organic: 1.0, staff: 'สิริพร พรมดี' },
+          'กายภาพบำบัด': { mean: 3.8, organic: 1.0, staff: 'สิริพร พรมดี' },
+          'แพทย์แผนไทย,แพทย์แผนจีน,สปาร์ ชั้น 4': { mean: 2.2, organic: 0.8, staff: 'ประไพพิศ อารีรมย์' },
+          'สปาร์': { mean: 2.2, organic: 0.8, staff: 'ประไพพิศ อารีรมย์' },
 
-          // --- Support, Nutrition, Laundry & Logistics (โภชนาการ ซักรีด จ่ายกลาง ซ่อมบำรุง) ---
-          'โภชนาการ': { mean: 3.61, organic: 12.36, staff: 'ปวีณา ลาสา' },
-          'โรงอาหาร': { mean: 4.12, organic: 8.24, staff: 'ปวีณา ลาสา' },
-          'จุดรวมข้างโรงอาหาร': { mean: 2.06, organic: 0.0, staff: 'ปวีณา ลาสา' },
-          'ซักรีด': { mean: 1.08, organic: 0.0, staff: 'ปวีณา ลาสา' },
-          'อาคารซ่อมบำรุง': { mean: 10.30, organic: 0.0, staff: 'ปวีณา ลาสา' },
-          'จ่ายกลาง': { mean: 4.12, organic: 0.0, staff: 'ศรีสุดา มะลิวัลย์' },
-          'จ่ายกลาง พัสดุ': { mean: 4.12, organic: 0.0, staff: 'ศรีสุดา มะลิวัลย์' },
-          'พัสดุ': { mean: 3.09, organic: 0.0, staff: 'ศรีสุดา มะลิวัลย์' },
-          'จุดรวมอาคารพักมูลฝอย': { mean: 2.06, organic: 0.0, staff: 'ปวีณา ลาสา' },
-          'วิหาร': { mean: 0.52, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' },
+          // --- Support, Nutrition, Maintenance & Logistics (โภชนาการ โรงอาหาร ซ่อมบำรุง จ่ายกลาง จุดรวมขยะ) ---
+          'อาคารซ่อมบำรุง': { mean: 30.5, organic: 4.5, staff: 'ปวีณา ลาสา' },
+          'โรงอาหาร': { mean: 15.5, organic: 38.0, staff: 'ปวีณา ลาสา' },
+          'โภชนาการ': { mean: 13.5, organic: 45.0, staff: 'ปวีณา ลาสา' },
+          'จ่ายกลาง': { mean: 13.5, organic: 2.2, staff: 'ศรีสุดา มะลิวัลย์' },
+          'จ่ายกลาง พัสดุ': { mean: 13.5, organic: 2.2, staff: 'ศรีสุดา มะลิวัลย์' },
+          'พัสดุ': { mean: 10.5, organic: 2.0, staff: 'ศรีสุดา มะลิวัลย์' },
+          'จุดรวมอาคารพักมูลฝอย': { mean: 10.5, organic: 3.2, staff: 'ปวีณา ลาสา' },
+          'จุดรวมข้างโรงอาหาร': { mean: 8.5, organic: 7.5, staff: 'ปวีณา ลาสา' },
+          'จุดรวมข้าง ER': { mean: 7.5, organic: 2.0, staff: 'ปวีณา ลาสา' },
+          'จุดตึกพรหม': { mean: 7.5, organic: 2.2, staff: 'ปวีณา ลาสา' },
+          'ซักรีด': { mean: 6.8, organic: 1.4, staff: 'ปวีณา ลาสา' },
+          'วิหาร': { mean: 1.8, organic: 0.8, staff: 'ประไพพิศ อารีรมย์' },
 
-          // --- Administration & Office (ธุรการ ประกัน องค์กรแพทย์ พรส) ---
-          'ธุรการ': { mean: 10.30, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' },
-          'ธุรการ ชั้น 2': { mean: 10.30, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' },
-          'องค์กรแพทย์': { mean: 0.52, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' },
-          'องค์กรแพทย์ ชั้น 2': { mean: 0.52, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' },
-          'พรส': { mean: 2.06, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' },
-          'พรส ชั้น 2': { mean: 2.06, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' },
-          'งานประกัน ชั้น 2': { mean: 1.03, organic: 0.0, staff: 'ประไพพิศ อารีรมย์' }
+          // --- Administration & Office (ฝ่ายบริหารและสำนักงาน จนท. 760 คน) ---
+          'ธุรการ ชั้น 2': { mean: 30.0, organic: 6.0, staff: 'ประไพพิศ อารีรมย์' },
+          'ธุรการ': { mean: 30.0, organic: 6.0, staff: 'ประไพพิศ อารีรมย์' },
+          'พรส ชั้น 2': { mean: 4.8, organic: 1.4, staff: 'ประไพพิศ อารีรมย์' },
+          'พรส': { mean: 4.8, organic: 1.4, staff: 'ประไพพิศ อารีรมย์' },
+          'งานประกัน ชั้น 2': { mean: 3.8, organic: 1.0, staff: 'ประไพพิศ อารีรมย์' },
+          'งานประกัน': { mean: 3.8, organic: 1.0, staff: 'ประไพพิศ อารีรมย์' },
+          'องค์กรแพทย์ ชั้น 2': { mean: 2.2, organic: 0.8, staff: 'ประไพพิศ อารีรมย์' },
+          'องค์กรแพทย์': { mean: 2.2, organic: 0.8, staff: 'ประไพพิศ อารีรมย์' }
         },
 
         pagination: {
@@ -5595,7 +5630,28 @@
           if (savedBaselines) {
             try {
               const parsed = JSON.parse(savedBaselines);
-              this.deptBaselineMap = { ...this.deptBaselineMap, ...parsed };
+              // หากเกณฑ์ที่เคยบันทึกไว้ในเบราว์เซอร์เดิมมียอดรวมต่ำกว่า 500 กก./วัน (ของเก่ามีเพียง ~236 กก./วัน)
+              // ให้เคลียร์เพื่ออัปเกรดเป็นเกณฑ์มาตรฐานใหม่ของปี 2569 (~794 กก./วัน หรือ 22,000-26,000 กก./เดือน)
+              const savedSum = Object.values(parsed).reduce((s, v) => s + (Number(v.mean) || 0), 0);
+              if (savedSum < 500) {
+                localStorage.removeItem('custom_dept_baselines');
+              } else {
+                for (const [k, v] of Object.entries(parsed)) {
+                  if (this.deptBaselineMap[k]) {
+                    if (v.mean) this.deptBaselineMap[k].mean = Number(v.mean);
+                    if (v.organic !== undefined && Number(v.organic) > 0) {
+                      this.deptBaselineMap[k].organic = Number(v.organic);
+                    }
+                    if (v.staff) this.deptBaselineMap[k].staff = v.staff;
+                  } else {
+                    this.deptBaselineMap[k] = {
+                      mean: Number(v.mean) || 10.5,
+                      organic: Number(v.organic) || 2.5,
+                      staff: v.staff || 'แสงตะวัน ชาวเขา'
+                    };
+                  }
+                }
+              }
             } catch(e) {}
           }
           localStorage.removeItem('auto_daily_gen');
@@ -9820,7 +9876,7 @@
         getDepartmentAutoWeight(deptId, deptName, targetDateStr) {
           const name = String(deptName || this.getDeptName(deptId) || '').trim();
           
-          // 1. ตรวจสอบปี พ.ศ. เป้าหมาย
+          // 1. ตรวจสอบปี พ.ศ. เป้าหมาย (ค่าเริ่มต้นปี 2569)
           let targetYearBE = 2569;
           if (targetDateStr) {
             const d = new Date(targetDateStr);
@@ -9829,134 +9885,90 @@
             }
           }
 
-          // 2. เกณฑ์โมเดลโรงพยาบาล ๕๐ พรรษา มหาวชิราลงกรณ (ขนาด 330 เตียง, อัตราครองเตียง 82%, OPD 1,050 ราย/วัน, จนท. 760 คน)
+          // 2. ข้อมูลเกณฑ์โมเดลโรงพยาบาล ๕๐ พรรษา มหาวชิราลงกรณ (ขนาด 330 เตียง, อัตราครองเตียง 82%, OPD 1,050 ราย/วัน, จนท. 760 คน)
+          // แนวโน้มการเกิดขยะเพิ่มขึ้นร้อยละ 3 ต่อปีในปี 2569 และ 2570
           const hospProfile = this.hospitalProfile || {
             totalBeds: 330,             // 330 เตียง
             bedOccupancyRate: 0.82,     // อัตราการครองเตียงเฉลี่ย 82% (~270 เตียงครองจริง/วัน)
             dailyOpdVisits: 1050,       // ผู้ป่วยนอกเฉลี่ย 1,050 ราย/วัน
             totalStaff: 760,            // บุคลากรและเจ้าหน้าที่ รพ. 760 คน
-            annualGrowthRate: 0.028     // แนวโน้มการเติบโตของปริมาณบริการ ~2.8% ต่อปี
+            baseYear: 2568,             // ปีฐานข้อมูล
+            annualGrowthRate: 0.030     // แนวโน้มการเติบโตของปริมาณขยะเพิ่มขึ้นร้อยละ 3 ในปี 69 และ 70
           };
 
-          // 3. ดึงข้อมูลจริงของทุกปีที่มีในระบบ (All-Year Historical Data Analysis)
-          const allHist = (this.generalWasteRecords || []).filter(r => 
-            String(r.department_id) === String(deptId) || 
-            String(r.department_id) === String(name) ||
-            this.getDeptName(r.department_id) === name
-          );
-
+          // 3. ค้นหาเกณฑ์เฉลี่ยรายแผนกจาก deptBaselineMap (เกณฑ์ปี 2569 ปรับเทียบรวม 50 แผนก = ~793.7 กก./วัน เดือนละ 22,000 - 26,000 กก.)
           let baseMean = 0;
           let baseOrg = 0;
+          let matched = false;
 
-          if (allHist.length > 0) {
-            // จัดกลุ่มข้อมูลตามปีเพื่อวิเคราะห์แนวโน้ม YoY Growth Trend จากข้อมูลจริงทุกปี
-            const yearsMap = {};
-            allHist.forEach(r => {
-              const yr = r.year || (r.waste_date ? (new Date(r.waste_date).getFullYear() > 2500 ? new Date(r.waste_date).getFullYear() : new Date(r.waste_date).getFullYear() + 543) : 2567);
-              if (!yearsMap[yr]) yearsMap[yr] = { genTotal: 0, orgTotal: 0, count: 0 };
-              yearsMap[yr].genTotal += Number(r.general_kg || 0);
-              yearsMap[yr].orgTotal += Number(r.organic_kg || 0);
-              yearsMap[yr].count++;
-            });
-
-            const sortedYears = Object.keys(yearsMap).map(Number).sort((a, b) => a - b);
-            const totalCount = allHist.length;
-            const sumGen = allHist.reduce((s, r) => s + (Number(r.general_kg) || 0), 0);
-            const sumOrg = allHist.reduce((s, r) => s + (Number(r.organic_kg) || 0), 0);
-            
-            const allTimeGenAvg = sumGen / totalCount;
-            const allTimeOrgAvg = sumOrg / totalCount;
-
-            // คำนวณอัตราแนวโน้มการเติบโตเฉลี่ยสะสม (Compound Trend Growth Rate)
-            let yearlyTrendRate = hospProfile.annualGrowthRate; // default ~2.8%
-            if (sortedYears.length >= 2) {
-              const firstYr = sortedYears[0];
-              const lastYr = sortedYears[sortedYears.length - 1];
-              const firstAvg = yearsMap[firstYr].genTotal / yearsMap[firstYr].count;
-              const lastAvg = yearsMap[lastYr].genTotal / yearsMap[lastYr].count;
-              const yrDiff = lastYr - firstYr;
-              if (yrDiff > 0 && firstAvg > 0 && lastAvg > 0) {
-                const empiricalRate = Math.pow(lastAvg / firstAvg, 1 / yrDiff) - 1;
-                // ควบคุมอัตราการเติบโตให้อยู่ในเกณฑ์สมจริง (1.5% - 5.0%)
-                yearlyTrendRate = Math.max(0.015, Math.min(0.050, empiricalRate));
-              }
-            }
-
-            // คำนวณพยากรณ์ล่วงหน้าสำหรับปี 2569 และปีถัดไป
-            const latestRecordedYear = sortedYears.length > 0 ? sortedYears[sortedYears.length - 1] : 2568;
-            const yearsAhead = Math.max(0, targetYearBE - latestRecordedYear);
-            const growthFactor = Math.pow(1 + yearlyTrendRate, yearsAhead);
-
-            baseMean = allTimeGenAvg * growthFactor;
-            baseOrg = allTimeOrgAvg * growthFactor;
+          // 3.1 ค้นหาแบบตรงชื่อเป๊ะ หรือตาม ID
+          if (this.deptBaselineMap && this.deptBaselineMap[name]) {
+            baseMean = this.deptBaselineMap[name].mean;
+            baseOrg = this.deptBaselineMap[name].organic;
+            matched = true;
+          } else if (this.deptBaselineMap && this.deptBaselineMap[deptId]) {
+            baseMean = this.deptBaselineMap[deptId].mean;
+            baseOrg = this.deptBaselineMap[deptId].organic;
+            matched = true;
           } else {
-            // 4. กรณีแผนกใหม่ที่ยังไม่มีประวัติในระบบ ใช้โมเดลพยากรณ์ตามขนาด 330 เตียง, อัตราครองเตียง 82%, OPD 1,050 ราย/วัน
-            let matched = false;
+            // 3.2 ค้นหาแบบ Partial Match จากคีย์ใน deptBaselineMap
             for (const [k, v] of Object.entries(this.deptBaselineMap || {})) {
-              if (name.includes(k) || k.includes(name)) {
-                baseMean = v.mean || 3.5;
-                baseOrg = v.organic || 0.0;
+              if (name === k || name.includes(k) || k.includes(name)) {
+                baseMean = v.mean || 10.5;
+                baseOrg = v.organic || 2.5;
                 matched = true;
                 break;
               }
             }
+          }
 
-            // จำแนกตามประเภทหน่วยงาน รพ. 330 เตียง
-            if (!matched) {
-              if (name.includes('ICU') || name.includes('วิกฤต') || name.includes('อายุรกรรม') || name.includes('ศัลยกรรม') || name.includes('หอผู้ป่วย') || name.includes('IPD') || name.includes('พิเศษ') || name.includes('กุมาร') || name.includes('สูติ')) {
-                // หอผู้ป่วยใน 330 เตียง (เฉลี่ย 28-35 เตียง/วอร์ด ที่อัตราครองเตียง 82%)
-                baseMean = 12.0 + (Math.random() * 4.5); // ~12.0 - 16.5 กก.
-                baseOrg = Math.random() * 1.5;           // ~0.0 - 1.5 กก.
-              } else if (name.includes('ผ่าตัด') || name.includes('วิสัญญี') || name.includes('ER') || name.includes('ฉุกเฉิน') || name.includes('ไต') || name.includes('คลอด') || name.includes('ส่องกล้อง') || name.includes('Cath')) {
-                // แผนกหัตถการและฉุกเฉิน
-                baseMean = 6.5 + (Math.random() * 3.5);  // ~6.5 - 10.0 กก.
-              } else if (name.includes('โภชนาการ') || name.includes('ครัว') || name.includes('อาหาร') || name.includes('โรงอาหาร')) {
-                // โภชนาการ (เตรียมอาหาร 3 มื้อสำหรับ 270 ผู้ป่วยครองเตียง + 760 จนท.) และโรงอาหาร
-                baseMean = 4.0 + (Math.random() * 2.0);  // ~4.0 - 6.0 กก.
-                baseOrg = 14.0 + (Math.random() * 5.0);  // ~14.0 - 19.0 กก. (ขยะอินทรีย์/เศษอาหาร)
-              } else if (name.includes('ซ่อมบำรุง') || name.includes('อาคาร') || name.includes('ยานพาหนะ') || name.includes('ซักรีด') || name.includes('ซักฟอก')) {
-                // สนับสนุนบริการ ซักรีดผ้า 330 เตียง และอาคารสถานที่
-                baseMean = 8.5 + (Math.random() * 2.5);  // ~8.5 - 11.0 กก.
-              } else if (name.includes('LAB') || name.includes('แล็บ') || name.includes('แลบ') || name.includes('ชันสูตร') || name.includes('ยา') || name.includes('เภสัช') || name.includes('X-Ray') || name.includes('รังสี') || name.includes('CT')) {
-                // ชันสูตร เภสัชกรรม และรังสีวิทยา
-                baseMean = 4.0 + (Math.random() * 4.2);  // ~4.0 - 8.2 กก.
-              } else if (name.includes('OPD') || name.includes('ตรวจ') || name.includes('คลินิก') || name.includes('ทันตกรรม') || name.includes('กายภาพ') || name.includes('จิตเวช') || name.includes('เวชกรรม') || name.includes('บริการ')) {
-                // คลินิกผู้ป่วยนอก (สถิติ 1,050 ราย/วัน กระจายตามคลินิกเฉพาะทาง)
-                baseMean = 2.2 + (Math.random() * 2.0);  // ~2.2 - 4.2 กก.
-              } else if (name.includes('ธุรการ') || name.includes('บริหาร') || name.includes('การเงิน') || name.includes('ประกัน') || name.includes('องค์กร') || name.includes('พรส') || name.includes('สารสนเทศ')) {
-                // งานบริหารและสำนักงาน (บุคลากร 760 คน)
-                baseMean = 1.2 + (Math.random() * 1.8);  // ~1.2 - 3.0 กก.
-              } else {
-                baseMean = 2.8 + (Math.random() * 1.5);  // ค่าเฉลี่ยสำรองทั่วไป ~2.8 - 4.3 กก.
-              }
+          // 3.3 กรณีเป็นแผนกใหม่ที่ไม่มีในเกณฑ์ จำแนกตามขนาดและประเภทหน่วยงาน (รพ. 330 เตียง สเกลปี 2569)
+          if (!matched) {
+            if (name.includes('อายุรกรรม') || name.includes('อายุกรรม')) {
+              baseMean = 45.0; baseOrg = 12.5;
+            } else if (name.includes('ศัลยกรรม') || name.includes('ออโถ') || name.includes('ออโต')) {
+              baseMean = 31.0; baseOrg = 8.5;
+            } else if (name.includes('ICU') || name.includes('วิกฤต') || name.includes('ผ่าตัด') || name.includes('ไตเทียม')) {
+              baseMean = 25.0; baseOrg = 4.8;
+            } else if (name.includes('กุมาร') || name.includes('VIP') || name.includes('พิเศษ') || name.includes('สงฆ์')) {
+              baseMean = 21.0; baseOrg = 6.5;
+            } else if (name.includes('โภชนาการ') || name.includes('โรงอาหาร')) {
+              baseMean = 14.5; baseOrg = 40.0;
+            } else if (name.includes('ซ่อมบำรุง') || name.includes('ธุรการ')) {
+              baseMean = 30.0; baseOrg = 5.5;
+            } else if (name.includes('จ่ายยา') || name.includes('ER') || name.includes('ฉุกเฉิน')) {
+              baseMean = 22.0; baseOrg = 3.5;
+            } else if (name.includes('คลอด') || name.includes('LAB') || name.includes('แล็บ') || name.includes('จ่ายกลาง') || name.includes('พัสดุ')) {
+              baseMean = 12.5; baseOrg = 2.4;
+            } else if (name.includes('OPD') || name.includes('ตรวจ') || name.includes('ทันตกรรม') || name.includes('คลินิก')) {
+              baseMean = 10.0; baseOrg = 2.4;
+            } else if (name.includes('X-Ray') || name.includes('CT') || name.includes('ซักรีด') || name.includes('คลังยา') || name.includes('จิตเวช')) {
+              baseMean = 6.8; baseOrg = 1.6;
+            } else if (name.includes('กายภาพ') || name.includes('ประกัน') || name.includes('พรส')) {
+              baseMean = 4.5; baseOrg = 1.2;
+            } else {
+              baseMean = 8.5; baseOrg = 2.0;
             }
-
-            // คำนวณแนวโน้มสำหรับปี 2569 และปีถัดไปจากปีฐาน 2568
-            const yearsAhead = Math.max(0, targetYearBE - 2568);
-            const growthFactor = Math.pow(1 + hospProfile.annualGrowthRate, yearsAhead);
-            baseMean = baseMean * growthFactor;
-            if (baseOrg > 0) baseOrg = baseOrg * growthFactor;
           }
 
-          if (baseMean <= 0) baseMean = 2.0;
+          // 4. คำนวณแนวโน้มการเติบโตตามปี พ.ศ. (เพิ่มขึ้นร้อยละ 3 ต่อปี สำหรับปี 69, 70 และปีถัดไป)
+          // ปี 2569 คือปีเกณฑ์หลัก (~793.7 กก./วัน เดือนละ 22,000 - 26,000 กก.)
+          const yearsAhead = targetYearBE - 2569;
+          const growthRate = hospProfile.annualGrowthRate || 0.030; // 3% YoY Growth
+          const growthFactor = Math.pow(1 + growthRate, yearsAhead);
+          baseMean = baseMean * growthFactor;
+          baseOrg = baseOrg * growthFactor;
 
-          // 5. เพิ่มการกระจายตัวแบบสุ่มธรรมชาติ (Natural Daily Jitter ±10% ถึง ±12%)
-          const jitter = 0.90 + (Math.random() * 0.20); // 0.90 - 1.10
-          let genKg = baseMean * jitter;
+          if (baseMean <= 0) baseMean = 5.0;
+          if (baseOrg <= 0) baseOrg = 1.0;
 
-          // จัดรูปแบบทศนิยมให้สมจริง
-          if (genKg < 1.0) {
-            genKg = Math.max(0.1, Number(genKg.toFixed(1)));
-          } else if (genKg < 10.0) {
-            genKg = Number(genKg.toFixed(1));
-          } else {
-            genKg = Number((Math.round(genKg * 2) / 2).toFixed(1)); // e.g. 11.5, 12.0, 14.5, 16.5
-          }
+          // 5. เพิ่มการกระจายตัวแบบสุ่มธรรมชาติในแต่ละวัน (Natural Daily Jitter ±5%)
+          const jitter = 0.95 + (Math.random() * 0.10); // 0.95 - 1.05
+          let genKg = Number((baseMean * jitter).toFixed(1));
+          let orgKg = Number((baseOrg * (0.95 + Math.random() * 0.10)).toFixed(1));
 
-          let orgKg = 0.0;
-          if (baseOrg > 0) {
-            orgKg = Number((baseOrg * (0.90 + Math.random() * 0.20)).toFixed(1));
-          }
+          if (genKg < 0.5) genKg = 0.5;
+          if (orgKg < 0.2) orgKg = 0.2;
 
           return { general_kg: genKg, organic_kg: orgKg };
         },
@@ -9987,7 +9999,7 @@
           const yrBE = String((dateObj.getFullYear() > 2500 ? dateObj.getFullYear() : dateObj.getFullYear() + 543));
           const moName = this.months[dateObj.getMonth()];
 
-          // ใช้รายชื่อแผนกทั้งหมดจาก refDepartments (รองรับ 50 แผนกและการเพิ่มแผนกในอนาคต)
+          // ใช้รายชื่อแผนกทั้งหมดจาก refDepartments (รองรับครบ 50 แผนกและการเพิ่มแผนกในอนาคต)
           const depts = (this.refDepartments && this.refDepartments.length > 0) 
             ? this.refDepartments 
             : Object.keys(this.deptBaselineMap).map(k => ({ id: k, department_name: k }));
@@ -10002,6 +10014,17 @@
             const dailyWeights = this.getDepartmentAutoWeight(deptId, deptName, dateClean);
             const staff = this.getDepartmentAutoStaff(deptId, deptName);
 
+            // ถัวเฉลี่ยขยะทั่วไปและอินทรีย์ระหว่างรอบเช้าและรอบบ่ายอย่างสมดุล:
+            // ขยะทั่วไป: รอบเช้า (~58-63%), รอบบ่าย (ส่วนที่เหลือ ~37-42%) เพื่อให้ผลรวมตรงกับยอดรายวัน
+            // ขยะอินทรีย์: รอบเช้า (~50-55%), รอบบ่าย (ส่วนที่เหลือ ~45-50%) เพื่อให้ผลรวมตรงกับยอดรายวัน
+            const mGenRatio = 0.58 + (Math.random() * 0.05); // 0.58 - 0.63
+            const mGenKg = Math.max(0.1, Number((dailyWeights.general_kg * mGenRatio).toFixed(1)));
+            const aGenKg = Math.max(0.1, Number((dailyWeights.general_kg - mGenKg).toFixed(1)));
+
+            const mOrgRatio = 0.50 + (Math.random() * 0.05); // 0.50 - 0.55
+            const mOrgKg = Math.max(0.1, Number((dailyWeights.organic_kg * mOrgRatio).toFixed(1)));
+            const aOrgKg = Math.max(0.1, Number((dailyWeights.organic_kg - mOrgKg).toFixed(1)));
+
             activeShifts.forEach(shift => {
               let shiftGeneral = 0;
               let shiftOrganic = 0;
@@ -10010,41 +10033,36 @@
 
               if (activeShifts.length === 1) {
                 if (shift === 'morning') {
-                  const mRatio = 0.60 + (Math.random() * 0.08); // 0.60 - 0.68
-                  shiftGeneral = Number((dailyWeights.general_kg * mRatio).toFixed(1));
-                  shiftOrganic = dailyWeights.organic_kg > 0 ? Number((dailyWeights.organic_kg * mRatio).toFixed(1)) : 0;
+                  shiftGeneral = mGenKg;
+                  shiftOrganic = mOrgKg;
                 } else {
-                  const aRatio = 0.32 + (Math.random() * 0.08); // 0.32 - 0.40
-                  shiftGeneral = Number((dailyWeights.general_kg * aRatio).toFixed(1));
-                  shiftOrganic = dailyWeights.organic_kg > 0 ? Number((dailyWeights.organic_kg * aRatio).toFixed(1)) : 0;
+                  shiftGeneral = aGenKg;
+                  shiftOrganic = aOrgKg;
                 }
               } else {
-                // แบ่งน้ำหนักขยะออกเป็น 2 รอบตามความเป็นจริงของ รพ. 330 เตียง:
-                // รอบเช้า (08:00-12:00 น.): ~60% - 68% (เฉลี่ย ~64%) รวมขยะสะสมกลางคืน + ตรวจ OPD เช้า + เตรียมอาหาร
-                // รอบบ่าย (13:00-16:00 น.): ~32% - 40% (เฉลี่ย ~36%) ขยะคลินิกบ่าย + เคลียร์ถาดอาหารกลางวัน + ราวด์บ่าย
+                // ทั้ง 2 รอบ (รอบเช้าและรอบบ่าย)
                 if (shift === 'morning') {
-                  const mRatio = 0.60 + (Math.random() * 0.08); // 0.60 - 0.68
-                  shiftGeneral = Number((dailyWeights.general_kg * mRatio).toFixed(1));
-                  shiftOrganic = dailyWeights.organic_kg > 0 ? Number((dailyWeights.organic_kg * mRatio).toFixed(1)) : 0;
+                  shiftGeneral = mGenKg;
+                  shiftOrganic = mOrgKg;
                 } else {
-                  const aRatio = 0.32 + (Math.random() * 0.08); // 0.32 - 0.40
-                  shiftGeneral = Number((dailyWeights.general_kg * aRatio).toFixed(1));
-                  shiftOrganic = dailyWeights.organic_kg > 0 ? Number((dailyWeights.organic_kg * aRatio).toFixed(1)) : 0;
+                  shiftGeneral = aGenKg;
+                  shiftOrganic = aOrgKg;
                 }
               }
 
               if (shiftGeneral < 0.1 && dailyWeights.general_kg > 0) shiftGeneral = 0.1;
+              if (shiftOrganic < 0.1 && dailyWeights.organic_kg > 0) shiftOrganic = 0.1;
 
               if (shift === 'morning') {
                 // รอบเช้า: 08:15 - 11:45 น.
                 const mHour = 8 + Math.floor(Math.random() * 4); // 8, 9, 10, 11
-                const mMin = Math.floor(Math.random() * 55) + 5;
+                const mMin = Math.floor(Math.random() * 50) + 5;
                 timeStr = `${String(mHour).padStart(2, '0')}:${String(mMin).padStart(2, '0')}:00`;
                 idSuffix = 'M';
               } else {
                 // รอบบ่าย: 13:15 - 15:45 น.
                 const aHour = 13 + Math.floor(Math.random() * 3); // 13, 14, 15
-                const aMin = Math.floor(Math.random() * 55) + 5;
+                const aMin = Math.floor(Math.random() * 50) + 5;
                 timeStr = `${String(aHour).padStart(2, '0')}:${String(aMin).padStart(2, '0')}:00`;
                 idSuffix = 'A';
               }
@@ -10201,6 +10219,301 @@
           }
           this.showAutoGenSettingsModal = true;
           this.autoGenSettingsTab = 'daily';
+        },
+
+        onGenWasteDeptSelected() {
+          if (!this.genWasteForm.department_id) return;
+          const deptId = this.genWasteForm.department_id;
+          const deptName = this.getDeptName(deptId);
+          const dClean = this.genWasteForm.waste_date || new Date().toISOString().split('T')[0];
+          const daily = this.getDepartmentAutoWeight(deptId, deptName, dClean);
+          const isMorning = this.genWasteForm.shift === 'morning';
+          const ratio = isMorning ? 0.64 : 0.36;
+          const orgRatio = isMorning ? 0.53 : 0.47;
+          
+          this.genWasteForm.general_kg = Number((daily.general_kg * ratio).toFixed(2));
+          this.genWasteForm.organic_kg = Number((daily.organic_kg * orgRatio).toFixed(2));
+        },
+
+        resetDeptBaselinesToDefault() {
+          localStorage.removeItem('custom_dept_baselines');
+          this.deptBaselineMap = {
+            // --- Inpatient Wards (หอผู้ป่วยใน - ผู้ป่วยใน 330 เตียง ขยะทั่วไป 18-53 กก./วัน, ขยะอินทรีย์ 5-15 กก./วัน) ---
+            'อายุกรรมหญิง ชั้น 2': { mean: 51.0, organic: 14.0, staff: 'เดือนเพ็ญ แก่นสายศ' },
+            'อายุรกรรมหญิง': { mean: 51.0, organic: 14.0, staff: 'เดือนเพ็ญ แก่นสายศ' },
+            'อายุกรรมชาย ชั้น 3': { mean: 49.0, organic: 13.5, staff: 'ฐิตาภรณ์ พันธ์คำ' },
+            'อายุรกรรมชาย': { mean: 49.0, organic: 13.5, staff: 'ฐิตาภรณ์ พันธ์คำ' },
+            'อายุรกรรมรวม ชั้น 8': { mean: 42.0, organic: 11.5, staff: 'อรทัย เนืองพงษ์' },
+            'อายุรกรรมรวม': { mean: 42.0, organic: 11.5, staff: 'อรทัย เนืองพงษ์' },
+            'ศัลยกรรม ชั้น 6': { mean: 33.5, organic: 9.5, staff: 'ปราณี คงดี' },
+            'ศัลยกรรม': { mean: 33.5, organic: 9.5, staff: 'ปราณี คงดี' },
+            'ออโถปิดิกส์ ชั้น 5': { mean: 29.0, organic: 8.0, staff: 'ไพรจิตร สิทธิ' },
+            'ออโตปิดิกส์': { mean: 29.0, organic: 8.0, staff: 'ไพรจิตร สิทธิ' },
+            'ออโถปิดิกส์': { mean: 29.0, organic: 8.0, staff: 'ไพรจิตร สิทธิ' },
+            'กุมารเวชกรรม ชั้น 7': { mean: 25.0, organic: 8.0, staff: 'พรรณี ขลุ่ยทอง' },
+            'กุมารเวชกรรม': { mean: 25.0, organic: 8.0, staff: 'พรรณี ขลุ่ยทอง' },
+            'หอผู้ป่วยในพิเศษ VIP8 ชั้น 8': { mean: 24.0, organic: 7.0, staff: 'อภัสณันท์ อบแก้ว' },
+            'พิเศษ8': { mean: 24.0, organic: 7.0, staff: 'อภัสณันท์ อบแก้ว' },
+            'หอผู้ป่วยในพิเศษ VIP7 ชั้น 7': { mean: 19.5, organic: 6.0, staff: 'อุไร บุญสวัสดิ์' },
+            'พิเศษ7': { mean: 19.5, organic: 6.0, staff: 'อุไร บุญสวัสดิ์' },
+            'สงฆ์อาพาธ ตึกพรหม': { mean: 18.0, organic: 5.2, staff: 'พรหมพร แวดล้อม' },
+            'สงฆ์อาพาธ': { mean: 18.0, organic: 5.2, staff: 'พรหมพร แวดล้อม' },
+            'พิเศษตึกพรหม': { mean: 18.0, organic: 5.2, staff: 'พรหมพร แวดล้อม' },
+
+            // --- Surgical, Critical & Procedure Units (หัตถการ ผ่าตัด วิกฤต ฉุกเฉิน) ---
+            'ผ่าตัด วิสัญญี ชั้น 5': { mean: 29.5, organic: 4.2, staff: 'ตินนา นันทะวงศ์' },
+            'ห้องผ่าตัด': { mean: 29.5, organic: 4.2, staff: 'ตินนา นันทะวงศ์' },
+            'วิสัญญี': { mean: 29.5, organic: 4.2, staff: 'ตินนา นันทะวงศ์' },
+            'ไตเทียม ชั้น 3': { mean: 25.0, organic: 4.5, staff: 'บัวลี แสงสว่าง' },
+            'ไตเทียม': { mean: 25.0, organic: 4.5, staff: 'บัวลี แสงสว่าง' },
+            'ICU อายุกรรม ชั้น 4': { mean: 23.5, organic: 5.0, staff: 'นงรัก รินริโก' },
+            'ICU อายุกรรม': { mean: 23.5, organic: 5.0, staff: 'นงรัก รินริโก' },
+            'ICU เมด': { mean: 23.5, organic: 5.0, staff: 'นงรัก รินริโก' },
+            'ICU ศัลยกรรม ชั้น 4': { mean: 23.5, organic: 5.0, staff: 'นงรัก รินริโก' },
+            'ICU ศัลยกรรม': { mean: 23.5, organic: 5.0, staff: 'นงรัก รินริโก' },
+            'จักษุ โสต ศอ นาสิก ชั้น 6': { mean: 23.0, organic: 6.0, staff: 'ปราณี คงดี' },
+            'จักษุ': { mean: 23.0, organic: 6.0, staff: 'ปราณี คงดี' },
+            'อุบัติเหตุฉุกเฉิน ER': { mean: 19.5, organic: 4.0, staff: 'อริริษา อารีรมย์' },
+            'ER': { mean: 19.5, organic: 4.0, staff: 'อริริษา อารีรมย์' },
+            'อุบัติเหตุฉุกเฉิน': { mean: 19.5, organic: 4.0, staff: 'อริริษา อารีรมย์' },
+            'ห้องคลอด สูตินารีเวช ชั้น 4': { mean: 13.5, organic: 3.8, staff: 'ไพรจิตร สิทธิ' },
+            'ห้องคลอด': { mean: 13.5, organic: 3.8, staff: 'ไพรจิตร สิทธิ' },
+            'ล้างไตในช่องท้อง CAPD ชั้น 2': { mean: 9.5, organic: 2.4, staff: 'ประไพพิศ อารีรมย์' },
+
+            // --- Diagnostics, Pharmacy & Labs (ชันสูตร ยา รังสี) ---
+            'ห้องจ่ายยา ชั้น 1': { mean: 26.0, organic: 3.2, staff: 'ฐิตาภรณ์ พันธ์คำ' },
+            'ห้องยา': { mean: 26.0, organic: 3.2, staff: 'ฐิตาภรณ์ พันธ์คำ' },
+            'ห้อง LAB ชั้น 1': { mean: 13.0, organic: 2.4, staff: 'นารอน สุวรรณา' },
+            'ห้องแลบ': { mean: 13.0, organic: 2.4, staff: 'นารอน สุวรรณา' },
+            'คลังยา อาคารเภสัช': { mean: 6.8, organic: 1.4, staff: 'นันทนา ทวีวงศ์' },
+            'คลังยาเภสัช': { mean: 6.8, organic: 1.4, staff: 'นันทนา ทวีวงศ์' },
+            'คลังยา': { mean: 6.8, organic: 1.4, staff: 'นันทนา ทวีวงศ์' },
+            'ห้อง X-RAY ชั้น 1': { mean: 6.8, organic: 1.5, staff: 'คมคาย ศรีเนตร' },
+            'X-Ray ชั้น 1': { mean: 6.8, organic: 1.5, staff: 'คมคาย ศรีเนตร' },
+            'X-RAY': { mean: 6.8, organic: 1.5, staff: 'คมคาย ศรีเนตร' },
+            'CT SCAN ชั้น 1': { mean: 6.8, organic: 1.5, staff: 'คมคาย ศรีเนตร' },
+            'CT SCAN': { mean: 6.8, organic: 1.5, staff: 'คมคาย ศรีเนตร' },
+
+            // --- Outpatient & Specialized Clinics (OPD และคลินิกเฉพาะทาง 1,050 ราย/วัน) ---
+            'OPD เฉพาะทาง ชั้น 3': { mean: 12.5, organic: 3.0, staff: 'วรรณา สดใส' },
+            'OPD เฉพาะทาง': { mean: 12.5, organic: 3.0, staff: 'วรรณา สดใส' },
+            'OPD GP ทั่วไป ชั้น1': { mean: 10.5, organic: 2.6, staff: 'คมคาย ศรีเนตร' },
+            'OPD GP': { mean: 10.5, organic: 2.6, staff: 'คมคาย ศรีเนตร' },
+            'เภสัชกรรม,ห้องน้ำ opd gp ห้องเอ็กเรย์ ,ct scan': { mean: 10.5, organic: 2.6, staff: 'คมคาย ศรีเนตร' },
+            'OPD NCD เฉพาะทาง ชั้น 1': { mean: 10.5, organic: 2.6, staff: 'วรรณา สดใส' },
+            'OPD NCD': { mean: 10.5, organic: 2.6, staff: 'วรรณา สดใส' },
+            'ทันตกรรม ชั้น 2': { mean: 10.5, organic: 2.4, staff: 'บัวลี แสงสว่าง' },
+            'ทันตกรรม': { mean: 10.5, organic: 2.4, staff: 'บัวลี แสงสว่าง' },
+            'OPD อายุรกรรมเด็ก ชั้น 3': { mean: 8.5, organic: 2.2, staff: 'บัวลี แสงสว่าง' },
+            'opd เด็ก': { mean: 8.5, organic: 2.2, staff: 'บัวลี แสงสว่าง' },
+            'คลินิกบริการ': { mean: 6.8, organic: 1.8, staff: 'วรรณา สดใส' },
+            'คลินิคตรวจสุขภาพ อาชีวเวชกรรม ชั้น 4': { mean: 6.8, organic: 1.8, staff: 'วรรณา สดใส' },
+            'งานจิตเวช ชั้น 2': { mean: 6.8, organic: 1.8, staff: 'วิภาดา มณีจันทร์' },
+            'งานจิตเวช': { mean: 6.8, organic: 1.8, staff: 'วิภาดา มณีจันทร์' },
+            'เวชกรรมสังคม ชั้น 9': { mean: 5.5, organic: 1.4, staff: 'กัญญารัตน์ ชัยศรี' },
+            'เวชกรรมสังคม': { mean: 5.5, organic: 1.4, staff: 'กัญญารัตน์ ชัยศรี' },
+            'กายภาพบำบัด ชั้น 9': { mean: 3.8, organic: 1.0, staff: 'สิริพร พรมดี' },
+            'กายภาพบำบัด': { mean: 3.8, organic: 1.0, staff: 'สิริพร พรมดี' },
+            'แพทย์แผนไทย,แพทย์แผนจีน,สปาร์ ชั้น 4': { mean: 2.2, organic: 0.8, staff: 'ประไพพิศ อารีรมย์' },
+            'สปาร์': { mean: 2.2, organic: 0.8, staff: 'ประไพพิศ อารีรมย์' },
+
+            // --- Support, Nutrition, Maintenance & Logistics (โภชนาการ โรงอาหาร ซ่อมบำรุง จ่ายกลาง จุดรวมขยะ) ---
+            'อาคารซ่อมบำรุง': { mean: 30.5, organic: 4.5, staff: 'ปวีณา ลาสา' },
+            'โรงอาหาร': { mean: 15.5, organic: 38.0, staff: 'ปวีณา ลาสา' },
+            'โภชนาการ': { mean: 13.5, organic: 45.0, staff: 'ปวีณา ลาสา' },
+            'จ่ายกลาง': { mean: 13.5, organic: 2.2, staff: 'ศรีสุดา มะลิวัลย์' },
+            'จ่ายกลาง พัสดุ': { mean: 13.5, organic: 2.2, staff: 'ศรีสุดา มะลิวัลย์' },
+            'พัสดุ': { mean: 10.5, organic: 2.0, staff: 'ศรีสุดา มะลิวัลย์' },
+            'จุดรวมอาคารพักมูลฝอย': { mean: 10.5, organic: 3.2, staff: 'ปวีณา ลาสา' },
+            'จุดรวมข้างโรงอาหาร': { mean: 8.5, organic: 7.5, staff: 'ปวีณา ลาสา' },
+            'จุดรวมข้าง ER': { mean: 7.5, organic: 2.0, staff: 'ปวีณา ลาสา' },
+            'จุดตึกพรหม': { mean: 7.5, organic: 2.2, staff: 'ปวีณา ลาสา' },
+            'ซักรีด': { mean: 6.8, organic: 1.4, staff: 'ปวีณา ลาสา' },
+            'วิหาร': { mean: 1.8, organic: 0.8, staff: 'ประไพพิศ อารีรมย์' },
+
+            // --- Administration & Office (ฝ่ายบริหารและสำนักงาน จนท. 760 คน) ---
+            'ธุรการ ชั้น 2': { mean: 30.0, organic: 6.0, staff: 'ประไพพิศ อารีรมย์' },
+            'ธุรการ': { mean: 30.0, organic: 6.0, staff: 'ประไพพิศ อารีรมย์' },
+            'พรส ชั้น 2': { mean: 4.8, organic: 1.4, staff: 'ประไพพิศ อารีรมย์' },
+            'พรส': { mean: 4.8, organic: 1.4, staff: 'ประไพพิศ อารีรมย์' },
+            'งานประกัน ชั้น 2': { mean: 3.8, organic: 1.0, staff: 'ประไพพิศ อารีรมย์' },
+            'งานประกัน': { mean: 3.8, organic: 1.0, staff: 'ประไพพิศ อารีรมย์' },
+            'องค์กรแพทย์ ชั้น 2': { mean: 2.2, organic: 0.8, staff: 'ประไพพิศ อารีรมย์' },
+            'องค์กรแพทย์': { mean: 2.2, organic: 0.8, staff: 'ประไพพิศ อารีรมย์' }
+          };
+          Swal.fire({
+            title: 'รีเซ็ตสำเร็จ',
+            text: 'คืนค่าเกณฑ์ขยะทั่วไปและขยะอินทรีย์ตามสถิติปี 2569 (22,000-26,000 กก./เดือน) ครบทุกแผนกเรียบร้อยแล้ว',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false
+          });
+        },
+
+        async balanceOrganicWasteForRecords() {
+          if (!this.isAdmin()) {
+            Swal.fire('ไม่มีสิทธิ์', 'เฉพาะผู้ดูแลระบบ (Admin) เท่านั้นที่สามารถปรับเกลี่ยข้อมูลขยะได้', 'warning');
+            return;
+          }
+
+          const allRecords = this.generalWasteRecords || [];
+          if (allRecords.length === 0) {
+            Swal.fire('ไม่พบข้อมูล', 'ไม่มีรายการบันทึกขยะทั่วไปในระบบ', 'info');
+            return;
+          }
+
+          const today = new Date().toISOString().split('T')[0];
+          const todayRecords = allRecords.filter(r => (this.cleanDate(r.waste_date) || r.waste_date) === today);
+          const emptyOrganicRecords = allRecords.filter(r => !r.organic_kg || parseFloat(r.organic_kg) === 0);
+
+          // ถามตัวเลือกการปรับเกลี่ยข้อมูล:
+          // 1. ปรับเฉพาะขยะอินทรีย์ (Organic Balance)
+          // 2. ปรับทั้งขยะทั่วไปและอินทรีย์ตามเกณฑ์สถิติปี 69 (Full Model Calibration 22,000 - 26,000 kg/mo)
+          const modeChoice = await Swal.fire({
+            title: '🌿 ปรับเกลี่ยข้อมูลขยะแยกแผนก',
+            html: `
+              <div class="text-left text-xs text-slate-300 space-y-2">
+                <p>เลือกรูปแบบที่ต้องการปรับเกลี่ยข้อมูลในระบบ:</p>
+                <div class="p-2.5 bg-slate-900 rounded-xl border border-slate-700/80 space-y-1.5">
+                  <div class="text-emerald-400 font-bold flex items-center gap-1.5">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <span>เกณฑ์สถิติปี 2569: เดือนละ 22,000 - 26,000 กก. (~794 กก./วัน)</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400">แผนกใหญ่ (วอร์ดอายุรกรรม, ศัลยกรรม, ผ่าตัด, ยา, ธุรการ ฯลฯ) มีน้ำหนักมาก แผนกเล็กลดหลั่นตามลำดับ และขยะอินทรีย์ถัวเฉลี่ยครบทุกแผนกทั้งเช้า-บ่าย</p>
+                </div>
+              </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '⚖️ ปรับเกลี่ยทั้งทั่วไปและอินทรีย์ (เกณฑ์ปี 69)',
+            denyButtonText: '🌿 ปรับเกลี่ยเฉพาะขยะอินทรีย์ที่เป็น 0.00',
+            cancelButtonText: 'ยกเลิก',
+            showDenyButton: true,
+            confirmButtonColor: '#f59e0b',
+            denyButtonColor: '#10b981',
+            cancelButtonColor: '#64748b'
+          });
+
+          if (modeChoice.isDismissed) return;
+
+          const isFullCalibration = modeChoice.isConfirmed; // true = calibrate both gen + org, false = only org
+          let candidateRecords = isFullCalibration ? allRecords : emptyOrganicRecords;
+
+          if (candidateRecords.length === 0) {
+            Swal.fire('ข้อมูลสมบูรณ์แล้ว', 'ไม่พบรายการที่ต้องปรับเกลี่ยตามเงื่อนไขที่เลือก', 'info');
+            return;
+          }
+
+          // ถามขอบเขตวันที่: เฉพาะวันนี้ หรือ ทั้งหมด
+          const targetTodayCandidates = candidateRecords.filter(r => (this.cleanDate(r.waste_date) || r.waste_date) === today);
+          let targetRecords = candidateRecords;
+
+          if (targetTodayCandidates.length > 0 && targetTodayCandidates.length < candidateRecords.length) {
+            const scopeChoice = await Swal.fire({
+              title: isFullCalibration ? '⚖️ เลือกขอบเขตการปรับเกลี่ย' : '🌿 เลือกขอบเขตขยะอินทรีย์',
+              html: `
+                <div class="text-left text-xs text-slate-300 space-y-2">
+                  <p>พบรายการในระบบทั้งหมด <strong class="text-white font-bold">${candidateRecords.length.toLocaleString()}</strong> รายการ</p>
+                  <p class="text-amber-400 font-semibold">• เฉพาะวันที่ปัจจุบัน (${this.formatDate(today)}): ${targetTodayCandidates.length} รายการ</p>
+                </div>
+              `,
+              icon: 'question',
+              showCancelButton: true,
+              confirmButtonText: `ปรับเฉพาะวันนี้ (${targetTodayCandidates.length} รายการ)`,
+              denyButtonText: `ปรับทั้งหมด (${candidateRecords.length} รายการ)`,
+              cancelButtonText: 'ยกเลิก',
+              showDenyButton: true,
+              confirmButtonColor: '#10b981',
+              denyButtonColor: '#f59e0b',
+              cancelButtonColor: '#64748b'
+            });
+
+            if (scopeChoice.isDismissed) return;
+            targetRecords = scopeChoice.isConfirmed ? targetTodayCandidates : candidateRecords;
+          }
+
+          if (!targetRecords || targetRecords.length === 0) return;
+
+          this.showLoader(true, `กำลังคำนวณและปรับเกลี่ยข้อมูล ${targetRecords.length.toLocaleString()} รายการ...`);
+
+          try {
+            const updatedRows = targetRecords.map(r => {
+              const dClean = this.cleanDate(r.waste_date) || r.waste_date || today;
+              const deptId = r.department_id;
+              const deptName = this.getDeptName(deptId);
+              const dailyWeights = this.getDepartmentAutoWeight(deptId, deptName, dClean);
+
+              // ตรวจสอบว่าเป็นรอบเช้าหรือบ่าย จาก ID หรือเวลาบันทึก
+              const isMorning = String(r.id || '').endsWith('-M') || 
+                                (r.created_at && (new Date(r.created_at).getHours() < 12 || (r.created_at.includes('T08') || r.created_at.includes('T09') || r.created_at.includes('T10') || r.created_at.includes('T11'))));
+
+              const mGenRatio = 0.60;
+              const aGenRatio = 0.40;
+              const mOrgRatio = 0.52;
+              const aOrgRatio = 0.48;
+
+              let newGenKg = Number(r.general_kg || 0);
+              let newOrgKg = Number(r.organic_kg || 0);
+
+              if (isFullCalibration) {
+                // ปรับเกลี่ยทั้งทั่วไปและอินทรีย์ตามเกณฑ์ปี 69
+                if (isMorning) {
+                  newGenKg = Math.max(0.1, Number((dailyWeights.general_kg * mGenRatio).toFixed(1)));
+                  newOrgKg = Math.max(0.1, Number((dailyWeights.organic_kg * mOrgRatio).toFixed(1)));
+                } else {
+                  newGenKg = Math.max(0.1, Number((dailyWeights.general_kg * aGenRatio).toFixed(1)));
+                  newOrgKg = Math.max(0.1, Number((dailyWeights.organic_kg * aOrgRatio).toFixed(1)));
+                }
+              } else {
+                // ปรับเฉพาะอินทรีย์ที่เป็น 0
+                if (isMorning) {
+                  newOrgKg = Math.max(0.1, Number((dailyWeights.organic_kg * mOrgRatio).toFixed(1)));
+                } else {
+                  newOrgKg = Math.max(0.1, Number((dailyWeights.organic_kg * aOrgRatio).toFixed(1)));
+                }
+              }
+
+              return {
+                ...r,
+                general_kg: newGenKg,
+                organic_kg: newOrgKg
+              };
+            });
+
+            if (this.isDbConnected && this.sbClient) {
+              const BATCH_SIZE = 200;
+              const totalBatches = Math.ceil(updatedRows.length / BATCH_SIZE);
+              for (let b = 0; b < totalBatches; b++) {
+                const batch = updatedRows.slice(b * BATCH_SIZE, (b + 1) * BATCH_SIZE);
+                this.showLoader(true, `กำลังบันทึกลง Supabase (${b + 1}/${totalBatches})...`);
+                const { error } = await this.sbClient.from('general_waste').upsert(batch);
+                if (error) throw error;
+              }
+              await this.fetchAllDataFromSupabase();
+            } else {
+              // Sandbox Mode
+              updatedRows.forEach(up => {
+                const idx = this.generalWasteRecords.findIndex(x => x.id === up.id);
+                if (idx !== -1) {
+                  this.generalWasteRecords[idx].general_kg = up.general_kg;
+                  this.generalWasteRecords[idx].organic_kg = up.organic_kg;
+                }
+              });
+            }
+
+            this.recalculateAllStats();
+
+            Swal.fire({
+              title: 'ปรับเกลี่ยสำเร็จ!',
+              text: `ปรับเกลี่ยข้อมูลตามเกณฑ์สถิติปี 2569 ครบทั้ง 50 แผนกทั้งรอบเช้าและรอบบ่ายเรียบร้อยแล้ว จำนวน ${updatedRows.length.toLocaleString()} รายการ`,
+              icon: 'success'
+            });
+          } catch(err) {
+            console.error('Error balancing waste records:', err);
+            Swal.fire('เกิดข้อผิดพลาด', err.message || 'ไม่สามารถปรับเกลี่ยข้อมูลขยะได้', 'error');
+          } finally {
+            this.showLoader(false);
+          }
         },
 
         openTaskSchedulerModal() {
